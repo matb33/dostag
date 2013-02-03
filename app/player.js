@@ -6,7 +6,6 @@ define("Player", ["Map"], function (Map) {
 		"slow": 80
 	};
 	var defaultSpeed = "normal";
-	var collection = new Meteor.Collection("players");
 
 	if (Meteor.isClient) {
 		return (function () {
@@ -16,102 +15,168 @@ define("Player", ["Map"], function (Map) {
 			}
 
 			function getPosition() {
-				return Session.get("pos");
+				var player = Meteor.user();
+				return player && player.position;
 			}
 
-			function setPosition(pos) {
-				Session.set("pos", pos);
+			function setPosition(position) {
+				Meteor.users.update({_id: Meteor.userId()}, {$set: {position: position}});
 			}
 
 			function getSpeed() {
-				return Session.get("speed");
+				var player = Meteor.user();
+				return player && player.speed;
 			}
 
 			function setSpeed(speed) {
-				Session.set("speed", speeds[speed]);
+				Meteor.users.update({_id: Meteor.userId()}, {$set: {speed: speeds[speed]}});
 			}
 
 			function getDirection() {
-				return Session.get("direction");
+				var player = Meteor.user();
+				return player && player.direction;
 			}
 
 			function setDirection(direction) {
-				Session.set("direction", direction);
+				Meteor.users.update({_id: Meteor.userId()}, {$set: {direction: direction}});
 			}
 
-			function bindKeys() {
-				$(document).keydown(function (evt) {
-					var pos = getPosition();
-					var dir;
+			function joinMapId(mapId) {
+				Meteor.users.update({_id: Meteor.userId()}, {$set: {mapId: mapId}});
+			}
 
-					switch (evt.keyCode) {
-						case 37: dir = "right"; break;
-						case 38: dir = "up"; break;
-						case 39: dir = "left"; break;
-						case 40: dir = "down"; break;
-					}
+			function leaveCurrentMap() {
+				Meteor.users.update({_id: Meteor.userId()}, {$unset: {mapId: 1}});
+			}
 
-					if (dir) {
-						setDirection(dir);
-					}
+			function getJoinedMapId() {
+				var player = Meteor.user();
+				return player && player.mapId;
+			}
 
-					if (evt.keyCode === 16 || evt.shiftKey) {
-						setSpeed("slow");
-					} else {
-						setSpeed("normal");
-					}
+			function initialize() {
+				Map.loadMapByUrl("http://localhost:4000/maps/map1.txt", function (mapId) {
+					setPosition({x: 21, y: 8});
+					setSpeed(defaultSpeed);
+					setDirection(null);
 
-					return false;
-				}).keyup(function (evt) {
-					switch (evt.keyCode) {
-						case 37:
-						case 38:
-						case 39:
-						case 40:
-							setDirection(null);
-							setSpeed(defaultSpeed);
-						break;
-						case 16:
-							setSpeed(defaultSpeed);
-					}
-
-					return false;
-				});
-
-				Meteor.startup(function () {
-					var speedIntervalId;
-					Meteor.autorun(function () {
-						Meteor.clearInterval(speedIntervalId);
-						speedIntervalId = Meteor.setInterval(function () {
-							var pos = getPosition();
-							var dir = getDirection();
-							switch (dir) {
-								case "up": 		pos.y -= 1; break;
-								case "down": 	pos.y += 1; break;
-								case "left": 	pos.x += 1; break;
-								case "right": 	pos.x -= 1; break;
-							}
-							if (!Map.collides(pos)) {
-								setPosition(pos);
-							}
-						}, getSpeed());
-					});
+					joinMapId(mapId);
 				});
 			}
 
 			Meteor.startup(function () {
-				setPosition({x: 21, y: 8});
-				setSpeed(defaultSpeed);
-				setDirection(null);
+				Meteor.autorun(function () {
+					// Always force user to be logged-in
+					if (!Meteor.userId()) {
+						Meteor.call("initiateAccount", function (error, username) {
+							Meteor.loginWithPassword({username: username}, "password", function (error) {
+								if (error) {
+									console.log(error);
+								}
+							});
+						});
+					} else {
+						initialize();
+					}
+				});
+			});
+
+			Meteor.startup(function () {
+				Meteor.autosubscribe(function () {
+					var player = Meteor.users.findOne({_id: Meteor.userId()});
+					if (player) {
+						Meteor.subscribe("mapUsers", player.mapId);
+						Meteor.subscribe("activeMap", player.mapId);
+					}
+				});
 			});
 
 			return {
 				getPlayerChar: getPlayerChar,
 				getPosition: getPosition,
-				bindKeys: bindKeys
+				getSpeed: getSpeed,
+				getDirection: getDirection,
+				setPosition: setPosition,
+				setSpeed: setSpeed,
+				setDirection: setDirection,
+				getJoinedMapId: getJoinedMapId
 			};
 
 		})();
 	}
 
+	if (Meteor.isServer) {
+		return (function () {
+
+			function rand(limit) {
+				return Math.floor(Math.random() * limit);
+			}
+
+			function generateRandomWord(length) {
+				var consonants = "bcdfghjklmnpqrstvwxyz";
+				var vowels = "aeiou";
+				var i, word = "", length = parseInt(length, 10);
+				var consonants = consonants.split("");
+				var vowels = vowels.split("");
+				var randConsonant;
+
+				for (i = 0; i < length / 2; i++) {
+					randConsonant = consonants[rand(consonants.length)],
+					randVowel = vowels[rand(vowels.length)];
+					word += (i === 0) ? randConsonant.toUpperCase() : randConsonant;
+					word += i * 2 < length - 1 ? randVowel : "";
+				}
+
+				return word;
+			}
+
+			function getUniqueUsername() {
+				var word;
+				var start = 3, end = 50, tries = 10;
+				for (var i = start; i <= end; i += (1 / tries)) {
+					word = generateRandomWord(Math.floor(i));
+					if (!Meteor.users.findOne({username: word})) {
+						return word;
+					}
+				}
+				return false;
+			}
+
+			Accounts.config({
+				sendVerificationEmail: false,
+				forbidClientAccountCreation: false
+			});
+
+			Meteor.methods({
+				"initiateAccount": function () {
+					var username;
+
+					if (Meteor.userId()) {
+						username = Meteor.user().username;
+					} else {
+						// Generate default user account
+						username = getUniqueUsername();
+
+						Accounts.createUser({
+							username: username,
+							password: "password"
+						});
+					}
+
+					return username;
+				}
+			});
+
+			// Can only modify own user record
+			Meteor.users.allow({
+				insert: function (userId) { return userId === Meteor.userId(); },
+				update: function (userId) { return userId === Meteor.userId(); },
+				remove: function (userId) { return userId === Meteor.userId(); }
+			});
+
+			Meteor.publish("mapUsers", function (mapId) {
+				return Meteor.users.find({mapId: mapId});
+			});
+		})();
+	}
 });

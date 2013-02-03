@@ -6,10 +6,12 @@ define("Map", function () {
 	if (Meteor.isClient) {
 		return (function () {
 
-			function loadMapByUrl(url) {
-				Meteor.call("loadMapByUrl", url, function (error, activeMapId) {
+			function loadMapByUrl(url, next) {
+				Meteor.call("loadMapByUrl", url, function (error, mapId) {
 					if (!error) {
-						setActiveMapId(activeMapId);
+						if (typeof next === "function") {
+							next(mapId);
+						}
 					}
 				});
 			}
@@ -18,20 +20,8 @@ define("Map", function () {
 				return collection.findOne({_id: mapId});
 			}
 
-			function getActiveMap() {
-				return getMap(getActiveMapId());
-			}
-
-			function getActiveMapId() {
-				return Session.get("activeMapId");
-			}
-
-			function setActiveMapId(mapId) {
-				Session.set("activeMapId", mapId);
-			}
-
-			function collides(pos) {
-				var map = getActiveMap();
+			function collides(mapId, pos) {
+				var map = getMap(mapId);
 				if (map) {
 					if (map.grid && map.grid[pos.y] && map.grid[pos.y][pos.x]) {
 						if (map.grid[pos.y][pos.x].trim() !== "") {
@@ -46,17 +36,9 @@ define("Map", function () {
 				return "∙";
 			}
 
-			Meteor.startup(function () {
-				loadMapByUrl(defaultMapUrl);
-
-				Meteor.autosubscribe(function () {
-					Meteor.subscribe("activeMap", getActiveMapId());
-				});
-			});
-
 			return {
 				loadMapByUrl: loadMapByUrl,
-				getActiveMap: getActiveMap,
+				getMap: getMap,
 				collides: collides,
 				getOOBChar: getOOBChar
 			};
