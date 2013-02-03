@@ -1,4 +1,4 @@
-define("Player", function () {
+define("Player", ["Map"], function (Map) {
 
 	var speeds = {
 		"normal": 50,
@@ -61,7 +61,7 @@ define("Player", function () {
 			function initialize() {
 				Meteor.call("loadMapByUrl", "http://localhost:3000/maps/map1.txt", function (error, mapId) {
 					if (!error) {
-						setPosition({x: 21, y: 8});
+						setPosition(Map.getRandomNonCollidePosition(mapId));
 						setSpeed(defaultSpeed);
 						setDirection(null);
 

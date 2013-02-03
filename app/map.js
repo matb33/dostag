@@ -13,13 +13,10 @@ define("Map", function () {
 				return collection.findOne({_id: mapId});
 			}
 
-			function collides(mapId, pos) {
-				var map = getMap(mapId);
-				if (map) {
-					if (map.grid && map.grid[pos.y] && map.grid[pos.y][pos.x]) {
-						if (map.grid[pos.y][pos.x].trim() !== "") {
-							return true;
-						}
+			function collides(map, pos) {
+				if (map.grid && map.grid[pos.y] && map.grid[pos.y][pos.x]) {
+					if (map.grid[pos.y][pos.x].trim() !== "") {
+						return true;
 					}
 				}
 				return false;
@@ -29,6 +26,21 @@ define("Map", function () {
 				return "∙";
 			}
 
+			function getRandomNonCollidePosition(mapId) {
+				var map = getMap(mapId), i, randPos;
+				if (map) {
+					for (i = 0; i < 5000; i++) {
+						randPos = {
+							x: Math.floor(Math.random() * map.width),
+							y: Math.floor(Math.random() * map.height)
+						};
+						if (!collides(map, randPos)) {
+							return randPos;
+						}
+					}
+				}
+			}
+
 			Meteor.startup(function () {
 				Meteor.subscribe("maps");
 			});
@@ -36,8 +48,12 @@ define("Map", function () {
 			return {
 				getMap: getMap,
 				getMaps: getMaps,
-				collides: collides,
-				getOOBChar: getOOBChar
+				collides: function (mapId, pos) {
+					var map = getMap(mapId);
+					return map && collides(map, pos);
+				},
+				getOOBChar: getOOBChar,
+				getRandomNonCollidePosition: getRandomNonCollidePosition
 			};
 
 		})();
