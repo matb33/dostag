@@ -1,4 +1,4 @@
-define("Player", ["Map"], function (Map) {
+define("Player", function () {
 
 	var speeds = {
 		"normal": 50,
@@ -11,8 +11,12 @@ define("Player", ["Map"], function (Map) {
 		return (function () {
 
 			function getPlayerChar() {
-				return "☺";
+				return "☻";
 			}
+
+			function getOtherPlayerChar() {
+				return "☺";
+			};
 
 			function getPosition() {
 				var player = Meteor.user();
@@ -55,12 +59,14 @@ define("Player", ["Map"], function (Map) {
 			}
 
 			function initialize() {
-				Map.loadMapByUrl("http://localhost:4000/maps/map1.txt", function (mapId) {
-					setPosition({x: 21, y: 8});
-					setSpeed(defaultSpeed);
-					setDirection(null);
+				Meteor.call("loadMapByUrl", "http://localhost:3000/maps/map1.txt", function (error, mapId) {
+					if (!error) {
+						setPosition({x: 21, y: 8});
+						setSpeed(defaultSpeed);
+						setDirection(null);
 
-					joinMapId(mapId);
+						joinMapId(mapId);
+					}
 				});
 			}
 
@@ -93,13 +99,16 @@ define("Player", ["Map"], function (Map) {
 
 			return {
 				getPlayerChar: getPlayerChar,
+				getOtherPlayerChar: getOtherPlayerChar,
 				getPosition: getPosition,
 				getSpeed: getSpeed,
 				getDirection: getDirection,
 				setPosition: setPosition,
 				setSpeed: setSpeed,
 				setDirection: setDirection,
-				getJoinedMapId: getJoinedMapId
+				getJoinedMapId: getJoinedMapId,
+				joinMapId: joinMapId,
+				defaultSpeed: defaultSpeed
 			};
 
 		})();

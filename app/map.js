@@ -1,20 +1,13 @@
 define("Map", function () {
 
-	var defaultMapUrl = "http://localhost:3000/maps/map1.txt";
 	var collection = new Meteor.Collection("activeMaps");
+
+	function getMaps() {
+		return collection.find();
+	}
 
 	if (Meteor.isClient) {
 		return (function () {
-
-			function loadMapByUrl(url, next) {
-				Meteor.call("loadMapByUrl", url, function (error, mapId) {
-					if (!error) {
-						if (typeof next === "function") {
-							next(mapId);
-						}
-					}
-				});
-			}
 
 			function getMap(mapId) {
 				return collection.findOne({_id: mapId});
@@ -36,9 +29,13 @@ define("Map", function () {
 				return "∙";
 			}
 
+			Meteor.startup(function () {
+				Meteor.subscribe("maps");
+			});
+
 			return {
-				loadMapByUrl: loadMapByUrl,
 				getMap: getMap,
+				getMaps: getMaps,
 				collides: collides,
 				getOOBChar: getOOBChar
 			};
@@ -50,7 +47,7 @@ define("Map", function () {
 		return (function () {
 
 			function loadMap(content, url) {
-				var mapId;
+				var mapId, existingMap, data;
 				var maxLength = 0;
 
 				var grid = [], x, y, line, lineLength;
@@ -74,12 +71,21 @@ define("Map", function () {
 					}
 				}
 
-				mapId = collection.insert({
+				data = {
 					url: url,
 					grid: grid,
 					width: maxLength,
 					height: y
-				});
+				};
+
+				existingMap = collection.findOne({url: url});
+
+				if (existingMap) {
+					mapId = existingMap._id;
+					collection.update({_id: mapId}, {$set: data});
+				} else {
+					mapId = collection.insert(data);
+				}
 
 				return mapId;
 			}
@@ -107,6 +113,10 @@ define("Map", function () {
 
 			Meteor.publish("activeMap", function (mapId) {
 				return collection.find({_id: mapId});
+			});
+
+			Meteor.publish("maps", function () {
+				return getMaps();
 			});
 
 			return {

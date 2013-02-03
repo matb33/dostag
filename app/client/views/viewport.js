@@ -5,16 +5,26 @@ using("Map", "Player", function (Map, Player) {
 
 	Template.viewport.render = function () {
 		var mapId = Player.getJoinedMapId();
-		console.log(mapId);
 		var map = Map.getMap(mapId);
 		var oobChar = Map.getOOBChar();
 		var playerChar = Player.getPlayerChar();
-		var pos, x1, x2, y1, y2, output = "", x, y;
+		var otherPlayerChar = Player.getOtherPlayerChar();
+		var pos, x1, x2, y1, y2, x, y, players, others = {}, output = "";
 
 		if (map) {
 			pos = Player.getPosition();
 
 			if (pos) {
+				players = Meteor.users.find();
+				players.forEach(function (player) {
+					var ox = player.position && player.position.x;
+					var oy = player.position && player.position.y;
+					if (!others[oy]) {
+						others[oy] = {};
+					}
+					others[oy][ox] = 1;
+				});
+
 				x1 = pos.x - (viewportCols / 2);
 				x2 = pos.x + (viewportCols / 2);
 				y1 = pos.y - (viewportRows / 2);
@@ -30,8 +40,13 @@ using("Map", "Player", function (Map, Player) {
 								// Render player
 								output += playerChar;
 							} else {
-								// Render map
-								output += map.grid[y][x];
+								if (others[y] && others[y][x]) {
+									// Render other player
+									output += otherPlayerChar;
+								} else {
+									// Render map
+									output += map.grid[y][x];
+								}
 							}
 						}
 					}
@@ -81,10 +96,10 @@ using("Map", "Player", function (Map, Player) {
 				case 39:
 				case 40:
 					Player.setDirection(null);
-					Player.setSpeed(defaultSpeed);
+					Player.setSpeed(Player.defaultSpeed);
 				break;
 				case 16:
-					Player.setSpeed(defaultSpeed);
+					Player.setSpeed(Player.defaultSpeed);
 			}
 
 			return false;
