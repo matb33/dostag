@@ -42,6 +42,10 @@ define("Map", function () {
 				return false;
 			}
 
+			function getOOBChar() {
+				return "∙";
+			}
+
 			Meteor.startup(function () {
 				loadMapByUrl(defaultMapUrl);
 
@@ -53,7 +57,8 @@ define("Map", function () {
 			return {
 				loadMapByUrl: loadMapByUrl,
 				getActiveMap: getActiveMap,
-				collides: collides
+				collides: collides,
+				getOOBChar: getOOBChar
 			};
 
 		})();
