@@ -69,66 +69,21 @@ using("Map", "Player", function (Map, Player) {
 	function bindKeys() {
 		$(document).keydown(function (evt) {
 			var pos = Player.getPosition();
-			var dir;
+			var mapId = Player.getJoinedMapId();
 
-			switch (evt.keyCode) {
-				case 37: dir = "right"; break;
-				case 38: dir = "up"; break;
-				case 39: dir = "left"; break;
-				case 40: dir = "down"; break;
-			}
-
-			if (dir) {
-				Player.setDirection(dir);
-			}
-
-			if (evt.keyCode === 16 || evt.shiftKey) {
-				Player.setSpeed("slow");
-			} else {
-				Player.setSpeed("normal");
-			}
-
-			return false;
-		}).keyup(function (evt) {
-			switch (evt.keyCode) {
-				case 37:
-				case 38:
-				case 39:
-				case 40:
-					Player.setDirection(null);
-					Player.setSpeed(Player.defaultSpeed);
-				break;
-				case 16:
-					Player.setSpeed(Player.defaultSpeed);
-			}
-
-			return false;
-		});
-
-		Meteor.startup(function () {
-			var speedIntervalId;
-			Meteor.autorun(function () {
-				var speed = Player.getSpeed();
-				if (speed) {
-					Meteor.clearInterval(speedIntervalId);
-					speedIntervalId = Meteor.setInterval(function () {
-						var pos = Player.getPosition();
-						var dir = Player.getDirection();
-						var mapId = Player.getJoinedMapId();
-						if (pos && dir && mapId) {
-							switch (dir) {
-								case "up": 		pos.y -= 1; break;
-								case "down": 	pos.y += 1; break;
-								case "left": 	pos.x += 1; break;
-								case "right": 	pos.x -= 1; break;
-							}
-							if (!Map.collides(mapId, pos)) {
-								Player.setPosition(pos);
-							}
-						}
-					}, speed);
+			if (pos && mapId) {
+				switch (evt.keyCode) {
+					case 37: pos.x -= 1; break;		// right
+					case 38: pos.y -= 1; break;		// up
+					case 39: pos.x += 1; break;		// left
+					case 40: pos.y += 1; break;		// down
 				}
-			});
+				if (!Map.collides(mapId, pos)) {
+					Player.setPosition(pos);
+				}
+			}
+
+			return false;
 		});
 	}
 

@@ -23,7 +23,7 @@ define("Map", function () {
 			}
 
 			function getOOBChar() {
-				return "∙";
+				return "·";
 			}
 
 			function getRandomNonCollidePosition(mapId) {

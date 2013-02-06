@@ -1,11 +1,7 @@
 define("Player", ["Map"], function (Map) {
 
-	var speeds = {
-		"normal": 50,
-		"fast": 30,
-		"slow": 80
-	};
-	var defaultSpeed = "normal";
+	var heartbeatInterval = 5000;
+	var keepaliveTimeout = 30000;
 
 	if (Meteor.isClient) {
 		return (function () {
@@ -27,26 +23,8 @@ define("Player", ["Map"], function (Map) {
 				Meteor.users.update({_id: Meteor.userId()}, {$set: {position: position}});
 			}
 
-			function getSpeed() {
-				var player = Meteor.user();
-				return player && player.speed;
-			}
-
-			function setSpeed(speed) {
-				Meteor.users.update({_id: Meteor.userId()}, {$set: {speed: speeds[speed]}});
-			}
-
-			function getDirection() {
-				var player = Meteor.user();
-				return player && player.direction;
-			}
-
-			function setDirection(direction) {
-				Meteor.users.update({_id: Meteor.userId()}, {$set: {direction: direction}});
-			}
-
 			function joinMapId(mapId) {
-				Meteor.users.update({_id: Meteor.userId()}, {$set: {mapId: mapId}});
+				Meteor.users.update({_id: Meteor.userId()}, {$set: {mapId: mapId, idle: false, last_keepalive: Date.now()}});
 			}
 
 			function leaveCurrentMap() {
@@ -58,38 +36,9 @@ define("Player", ["Map"], function (Map) {
 				return player && player.mapId;
 			}
 
-			function initialize() {
-				Meteor.call("loadMapByUrl", "http://localhost:3000/maps/map1.txt", function (error, mapId) {
-					if (!error) {
-						setPosition(Map.getRandomNonCollidePosition(mapId));
-						setSpeed(defaultSpeed);
-						setDirection(null);
-
-						joinMapId(mapId);
-					}
-				});
-			}
-
-			Meteor.startup(function () {
-				Meteor.autorun(function () {
-					// Always force user to be logged-in
-					if (!Meteor.userId()) {
-						Meteor.call("initiateAccount", function (error, username) {
-							Meteor.loginWithPassword({username: username}, "password", function (error) {
-								if (error) {
-									console.log(error);
-								}
-							});
-						});
-					} else {
-						initialize();
-					}
-				});
-			});
-
 			Meteor.startup(function () {
 				Meteor.autosubscribe(function () {
-					var player = Meteor.users.findOne({_id: Meteor.userId()});
+					var player = Meteor.user();
 					if (player) {
 						Meteor.subscribe("mapUsers", player.mapId);
 						Meteor.subscribe("activeMap", player.mapId);
@@ -97,18 +46,17 @@ define("Player", ["Map"], function (Map) {
 				});
 			});
 
+			Meteor.setInterval(function () {
+				Meteor.call("keepalive", Meteor.userId());
+			}, heartbeatInterval);
+
 			return {
 				getPlayerChar: getPlayerChar,
 				getOtherPlayerChar: getOtherPlayerChar,
 				getPosition: getPosition,
-				getSpeed: getSpeed,
-				getDirection: getDirection,
 				setPosition: setPosition,
-				setSpeed: setSpeed,
-				setDirection: setDirection,
 				getJoinedMapId: getJoinedMapId,
-				joinMapId: joinMapId,
-				defaultSpeed: defaultSpeed
+				joinMapId: joinMapId
 			};
 
 		})();
@@ -157,7 +105,7 @@ define("Player", ["Map"], function (Map) {
 			});
 
 			Meteor.methods({
-				"initiateAccount": function () {
+				initiateAccount: function () {
 					var username;
 
 					if (Meteor.userId()) {
@@ -173,8 +121,21 @@ define("Player", ["Map"], function (Map) {
 					}
 
 					return username;
+				},
+				keepalive: function (userId) {
+					var player = Meteor.users.findOne({_id: userId});
+					if (player) {
+						Meteor.users.update({_id: player._id}, {$set: {last_keepalive: Date.now()}});
+					}
 				}
 			});
+
+			Meteor.setInterval(function () {
+				var idleUsers = Meteor.users.find({last_keepalive: {$lt: (Date.now() - keepaliveTimeout)}});
+				idleUsers.forEach(function (idleUser) {
+					Meteor.users.update({_id: idleUser._id}, {$set: {idle: true}});
+				});
+			}, heartbeatInterval);
 
 			// Can only modify own user record
 			Meteor.users.allow({
@@ -184,7 +145,7 @@ define("Player", ["Map"], function (Map) {
 			});
 
 			Meteor.publish("mapUsers", function (mapId) {
-				return Meteor.users.find({mapId: mapId});
+				return Meteor.users.find({mapId: mapId, idle: false});
 			});
 		})();
 	}
