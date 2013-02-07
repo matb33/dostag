@@ -1,7 +1,15 @@
-(function () {
+using("Env", function (Env) {
 
 	function initialize() {
-		Meteor.call("loadMapByUrl", "http://localhost:3000/maps/map1.txt", function (error, mapId) {
+		var map;
+
+		if (Env.isProduction) {
+			map = "http://dostag.meteor.com/maps/map1.txt";
+		} else {
+			map = "http://localhost:3000/maps/map1.txt";
+		}
+
+		Meteor.call("loadMapByUrl", map, function (error, mapId) {
 			if (!error) {
 				Meteor.call("joinMapId", mapId, true);
 			}
@@ -25,4 +33,4 @@
 		});
 	});
 
-})();
+});
