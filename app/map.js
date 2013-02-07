@@ -5,7 +5,7 @@ define("Map", ["Collections"], function (Collections) {
 	}
 
 	function getMapById(mapId) {
-		return Collections.ActiveMaps.find({_id: mapId});
+		return Collections.ActiveMaps.findOne({_id: mapId});
 	}
 
 	function collides(map, pos) {

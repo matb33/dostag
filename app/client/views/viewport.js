@@ -8,7 +8,7 @@ using("Map", "Player", "Sprites", function (Map, Player, Sprites) {
 		var map = Map.getMapById(mapId);
 		var pos, x1, x2, y1, y2, x, y, players, others = {}, output = "";
 
-		if (map) {
+		if (map && map.grid) {
 			pos = Player.getPosition();
 
 			if (pos) {

@@ -13,7 +13,7 @@ using("Collections", function (Collections) {
 		update: function (userId) { return userId === Meteor.userId(); },
 		remove: function (userId) { return userId === Meteor.userId(); }
 	});
-	// Users aren't allowed to modify their positions directly
+	// However, users aren't allowed to modify their own positions directly
 	Meteor.users.deny({
 		update: function (userId, docs, fields) { return _.contains(fields, "position"); }
 	});

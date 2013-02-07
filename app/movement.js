@@ -13,9 +13,7 @@ using("Player", "Map", function (Player, Map) {
 					case 4: pos.y += 1; break;		// down
 				}
 				if (!Map.collides(mapId, pos)) {
-					// TODO: with the security in place, will this work as expected?? Will the client simulate the movement,
-					// or will we get Access Denied??
-					Meteor.users.update({_id: Meteor.userId()}, {$set: {position: position}});
+					Meteor.users.update({_id: Meteor.userId()}, {$set: {position: pos}});
 				}
 			}
 		}
@@ -27,9 +25,9 @@ using("Player", "Map", function (Player, Map) {
 		Meteor.methods({
 			moveToRandomNonCollide: function () {
 				var mapId = Player.getJoinedMapId();
-				var position = Map.getRandomNonCollidePosition(mapId);
+				var pos = Map.getRandomNonCollidePosition(mapId);
 
-				Meteor.users.update({_id: Meteor.userId()}, {$set: {position: position}});
+				Meteor.users.update({_id: Meteor.userId()}, {$set: {position: pos}});
 			}
 		});
 	}
