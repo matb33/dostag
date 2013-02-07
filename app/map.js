@@ -8,14 +8,20 @@ define("Map", ["Collections"], function (Collections) {
 		return Collections.ActiveMaps.findOne({_id: mapId});
 	}
 
+	function isTraversable(c) {
+		return c === null || c === undefined || c.trim() === "";
+	}
+
 	function collides(map, pos) {
+		var key;
 		if (map) {
 			if (!map.grid) {
 				// Support passing the map id
 				map = getMapById(map);
 			}
-			if (map.grid && map.grid[pos.y] && map.grid[pos.y][pos.x]) {
-				if (map.grid[pos.y][pos.x].trim() !== "") {
+			key = pos.y + "_" + pos.x;
+			if (map.grid && map.grid[key]) {
+				if (!isTraversable(map.grid[key])) {
 					return true;
 				}
 			}
@@ -38,39 +44,61 @@ define("Map", ["Collections"], function (Collections) {
 		}
 	}
 
+	function mapStringToGridObject(map) {
+		var maxLength = 0;
+		var grid = {}, x, y, line, lineLength, key;
+		var lines = map.split(/\r\n|\r|\n/g);
+
+		for (y = 0; y < lines.length; y++) {
+			lineLength = lines[y].length;
+			maxLength = lineLength > maxLength ? lineLength : maxLength;
+		}
+
+		for (y = 0; y < lines.length; y++) {
+			line = lines[y];
+			lineLength = line.length;
+			for (x = 0; x < maxLength; x++) {
+				key = y + "_" + x;
+				if (x < lineLength) {
+					grid[key] = line.charAt(x);
+				} else {
+					grid[key] = " ";
+				}
+			}
+		}
+
+		return {
+			grid: grid,
+			width: maxLength,
+			height: y
+		};
+	}
+
+	function generateNullGridObject(w, h) {
+		var grid = {};
+		for (y = 0; y < h; y++) {
+			for (x = 0; x < w; x++) {
+				grid[y + "_" + x] = null;
+			}
+		}
+		return grid;
+	}
+
 	if (Meteor.isServer) {
 		(function () {
 
 			function loadMap(content, url) {
-				var mapId, existingMap, data;
-				var maxLength = 0;
-
-				var grid = [], x, y, line, lineLength;
-				var lines = content.split(/\r\n|\r|\n/g);
-
-				for (y = 0; y < lines.length; y++) {
-					lineLength = lines[y].length;
-					maxLength = lineLength > maxLength ? lineLength : maxLength;
-				}
-
-				for (y = 0; y < lines.length; y++) {
-					grid[y] = [];
-					line = lines[y];
-					lineLength = line.length;
-					for (x = 0; x < maxLength; x++) {
-						if (x < lineLength) {
-							grid[y][x] = line.charAt(x);
-						} else {
-							grid[y][x] = " ";
-						}
-					}
-				}
+				var mapId, existingMap, data, x, y;
+				var result = mapStringToGridObject(content);
+				var overlay = generateNullGridObject(result.width, result.height);
 
 				data = {
 					url: url,
-					grid: grid,
-					width: maxLength,
-					height: y
+					content: content,
+					grid: result.grid,
+					overlay: overlay,
+					width: result.width,
+					height: result.height
 				};
 
 				existingMap = Collections.ActiveMaps.findOne({url: url});
@@ -104,8 +132,11 @@ define("Map", ["Collections"], function (Collections) {
 	return {
 		getMaps: getMaps,
 		getMapById: getMapById,
+		isTraversable: isTraversable,
 		collides: collides,
-		getRandomNonCollidePosition: getRandomNonCollidePosition
+		getRandomNonCollidePosition: getRandomNonCollidePosition,
+		mapStringToGridObject: mapStringToGridObject,
+		generateNullGridObject: generateNullGridObject
 	};
 
 });

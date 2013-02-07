@@ -3,19 +3,23 @@ define("Player", ["Map"], function (Map) {
 	var heartbeatInterval = 5000;
 	var keepaliveTimeout = 30000;
 
-	function getPosition() {
-		var player = Meteor.user();
+	function getPlayer(userId) {
+		return userId ? Meteor.users.findOne({_id: userId}) : Meteor.user();
+	}
+
+	function getPosition(userId) {
+		var player = getPlayer(userId);
 		return player && player.position;
 	}
 
-	function getJoinedMapId() {
-		var player = Meteor.user();
+	function getJoinedMapId(userId) {
+		var player = getPlayer(userId);
 		return player && player.mapId;
 	}
 
 	Meteor.methods({
 		joinMapId: function (mapId, randomizePosition) {
-			Meteor.users.update({_id: Meteor.userId()}, {$set: {
+			Meteor.users.update({_id: this.userId}, {$set: {
 				mapId: mapId,
 				idle: false,
 				last_keepalive: Date.now()
@@ -26,7 +30,7 @@ define("Player", ["Map"], function (Map) {
 			}
 		},
 		leaveCurrentMap: function () {
-			Meteor.users.update({_id: Meteor.userId()}, {$unset: {mapId: 1}});
+			Meteor.users.update({_id: this.userId}, {$unset: {mapId: 1}});
 		}
 	});
 
@@ -74,10 +78,11 @@ define("Player", ["Map"], function (Map) {
 
 			Meteor.methods({
 				initiateAccount: function () {
-					var username;
+					var username, user;
 
-					if (Meteor.userId()) {
-						username = Meteor.user().username;
+					if (this.userId) {
+						user = Meteor.users.findOne({_id: this.userId});
+						username = user && user.username;
 					} else {
 						// Generate default user account
 						username = getUniqueUsername();
@@ -90,10 +95,10 @@ define("Player", ["Map"], function (Map) {
 
 					return username;
 				},
-				keepalive: function (userId) {
-					var player = Meteor.users.findOne({_id: userId});
+				keepalive: function () {
+					var player = Meteor.users.findOne({_id: this.userId});
 					if (player) {
-						Meteor.users.update({_id: player._id}, {$set: {last_keepalive: Date.now()}});
+						Meteor.users.update({_id: this.userId}, {$set: {last_keepalive: Date.now()}});
 					}
 				}
 			});
@@ -110,7 +115,7 @@ define("Player", ["Map"], function (Map) {
 
 	if (Meteor.isClient) {
 		Meteor.setInterval(function () {
-			Meteor.call("keepalive", Meteor.userId());
+			Meteor.call("keepalive");
 		}, heartbeatInterval);
 	}
 

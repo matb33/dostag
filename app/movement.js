@@ -2,8 +2,8 @@ using("Player", "Map", function (Player, Map) {
 
 	Meteor.methods({
 		moveDirection: function (direction) {
-			var pos = Player.getPosition();
-			var mapId = Player.getJoinedMapId();
+			var pos = Player.getPosition(this.userId);
+			var mapId = Player.getJoinedMapId(this.userId);
 
 			if (pos && mapId) {
 				switch (direction) {
@@ -13,7 +13,7 @@ using("Player", "Map", function (Player, Map) {
 					case 4: pos.y += 1; break;		// down
 				}
 				if (!Map.collides(mapId, pos)) {
-					Meteor.users.update({_id: Meteor.userId()}, {$set: {position: pos}});
+					Meteor.users.update({_id: this.userId}, {$set: {position: pos}});
 				}
 			}
 		}
@@ -24,10 +24,10 @@ using("Player", "Map", function (Player, Map) {
 		// can't be simulated on the client
 		Meteor.methods({
 			moveToRandomNonCollide: function () {
-				var mapId = Player.getJoinedMapId();
+				var mapId = Player.getJoinedMapId(this.userId);
 				var pos = Map.getRandomNonCollidePosition(mapId);
 
-				Meteor.users.update({_id: Meteor.userId()}, {$set: {position: pos}});
+				Meteor.users.update({_id: this.userId}, {$set: {position: pos}});
 			}
 		});
 	}
