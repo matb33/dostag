@@ -10,7 +10,7 @@ Meteor.startup(function () {
 			case 40: direction = 4; break;			// down
 
 			case 66: weapon = "bomb"; break;		// b
-			case 78: weapon = "napalm"; break;		// n
+			//case 78: weapon = "napalm"; break;		// n
 
 			case 87: weapon = "pickaxe_u"; break;	// w
 			case 83: weapon = "pickaxe_d"; break;	// s

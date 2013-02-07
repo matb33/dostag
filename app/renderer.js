@@ -1,74 +1,4 @@
-define("Renderer", ["Map", "Player", "Sprites", "Collections"], function (Map, Player, Sprites, Collections) {
-
-	function add(sx, sy, text, target) {
-		var x, y, c, result = Map.mapStringToGridObject(text);
-		if (target) {
-			for (y = sy; y < sy + result.height; y++) {
-				for (x = sx; x < sx + result.width; x++) {
-					c = result.grid[(y - sy) + "_" + (x - sx)];
-					if (!Map.isTraversable(c)) {
-						target[y + "_" + x] = c;
-					}
-				}
-			}
-		}
-		return target;
-	}
-
-	function sub(sx, sy, text, target) {
-		var x, y, c, result = Map.mapStringToGridObject(text);
-		if (target) {
-			for (y = sy; y < sy + result.height; y++) {
-				for (x = sx; x < sx + result.width; x++) {
-					c = result.grid[(y - sy) + "_" + (x - sx)];
-					if (!Map.isTraversable(c)) {
-						target[y + "_" + x] = null;
-					}
-				}
-			}
-		}
-		return target;
-	}
-
-	function replace(sx, sy, text) {
-		if (!this.userId) throw new Error("You must use replace.call syntax originating from within the context of Meteor.methods");
-
-		var mapId = Player.getJoinedMapId(this.userId);
-		var map = Map.getMapById(mapId);
-		var result = add(sx, sy, text, map.grid);
-
-		Collections.ActiveMaps.update({_id: mapId}, {$set: {grid: result}});
-	}
-
-	function addOverlay(sx, sy, text) {
-		if (!this.userId) throw new Error("You must use addOverlay.call syntax originating from within the context of Meteor.methods");
-
-		var mapId = Player.getJoinedMapId(this.userId);
-		var map = Map.getMapById(mapId);
-		var result = add(sx, sy, text, map.overlay);
-
-		Collections.ActiveMaps.update({_id: mapId}, {$set: {overlay: result}});
-	}
-
-	function subOverlay(sx, sy, text) {
-		if (!this.userId) throw new Error("You must use subOverlay.call syntax originating from within the context of Meteor.methods");
-
-		var mapId = Player.getJoinedMapId(this.userId);
-		var map = Map.getMapById(mapId);
-		var result = sub(sx, sy, text, map.overlay);
-
-		Collections.ActiveMaps.update({_id: mapId}, {$set: {overlay: result}});
-	}
-
-	function clearOverlay() {
-		if (!this.userId) throw new Error("You must use clearOverlay.call syntax originating from within the context of Meteor.methods");
-
-		var mapId = Player.getJoinedMapId(this.userId);
-		var map = Map.getMapById(mapId);
-		var result = Map.generateNullGridObject(map.width, map.height);
-
-		Collections.ActiveMaps.update({_id: mapId}, {$set: {overlay: result}});
-	}
+define("Renderer", ["Map", "Player", "Sprites"], function (Map, Player, Sprites) {
 
 	if (Meteor.isClient) {
 		return (function () {
@@ -138,10 +68,6 @@ define("Renderer", ["Map", "Player", "Sprites", "Collections"], function (Map, P
 			});
 
 			return {
-				replace: replace,
-				addOverlay: addOverlay,
-				subOverlay: subOverlay,
-				clearOverlay: clearOverlay,
 				getRenderedMap: function () {
 					return Session.get("renderedMap");
 				}
@@ -149,12 +75,5 @@ define("Renderer", ["Map", "Player", "Sprites", "Collections"], function (Map, P
 
 		})();
 	}
-
-	return {
-		replace: replace,
-		addOverlay: addOverlay,
-		subOverlay: subOverlay,
-		clearOverlay: clearOverlay
-	};
 
 })

@@ -7,7 +7,9 @@ using("Collections", function (Collections) {
 			return false;
 		},
 		update: function (userId, docs, fields) {
-			return _.contains(fields, "overlay");
+			// TODO: Figure out how we can do this better... this gives the client
+			// full access to mess with the grid and overlay
+			return _.contains(fields, "overlay") || _.contains(fields, "grid");
 		},
 		remove: function () {
 			return false;

@@ -1,4 +1,4 @@
-using("Weapon", "Sprites", function (Weapon, Sprites) {
+using("Weapon", "Map", "Damager", "Sprites", function (Weapon, Map, Damager, Sprites) {
 
 	var f1 = {
 		x: 0,
@@ -41,28 +41,28 @@ using("Weapon", "Sprites", function (Weapon, Sprites) {
 	f3.t = f3.t.replace(new RegExp("#", "g"), Sprites.Weapon.EXPLOSION);
 	f4.t = f4.t.replace(new RegExp("#", "g"), Sprites.Weapon.EXPLOSION);
 
-	Weapon.define("bomb", function (grid, ox, oy, renderer, damager, setTimeout) {
+	Weapon.define("bomb", function (grid, ox, oy, setTimeout, clearTimeout, setInterval, clearInterval) {
 		var self = this;
 
 		setTimeout(function () {
-			renderer.addOverlay.call(self, ox + f1.x, oy + f1.y, f1.t);
-			damager.add.call(self, ox + f1.x, oy + f1.y, f1.t);
+			Map.addOverlay.call(self, ox + f1.x, oy + f1.y, f1.t);
+			Damager.add.call(self, ox + f1.x, oy + f1.y, f1.t);
 
 			setTimeout(function () {
-				renderer.addOverlay.call(self, ox + f2.x, oy + f2.y, f2.t);
-				damager.add.call(self, ox + f2.x, oy + f2.y, f2.t);
+				Map.addOverlay.call(self, ox + f2.x, oy + f2.y, f2.t);
+				Damager.add.call(self, ox + f2.x, oy + f2.y, f2.t);
 
 				setTimeout(function () {
-					renderer.addOverlay.call(self, ox + f3.x, oy + f3.y, f3.t);
-					damager.add.call(self, ox + f3.x, oy + f3.y, f3.t);
+					Map.addOverlay.call(self, ox + f3.x, oy + f3.y, f3.t);
+					Damager.add.call(self, ox + f3.x, oy + f3.y, f3.t);
 
 					setTimeout(function () {
-						renderer.addOverlay.call(self, ox + f4.x, oy + f4.y, f4.t);
-						damager.add.call(self, ox + f4.x, oy + f4.y, f4.t);
+						Map.addOverlay.call(self, ox + f4.x, oy + f4.y, f4.t);
+						Damager.add.call(self, ox + f4.x, oy + f4.y, f4.t);
 
 						setTimeout(function () {
-							renderer.subOverlay.call(self, ox + f4.x, oy + f4.y, f4.t);
-							damager.sub.call(self, ox + f4.x, oy + f4.y, f4.t);
+							Map.subOverlay.call(self, ox + f4.x, oy + f4.y, f4.t);
+							Damager.sub.call(self, ox + f4.x, oy + f4.y, f4.t);
 						}, 500);
 					}, 40);
 				}, 40);

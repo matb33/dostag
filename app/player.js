@@ -1,4 +1,4 @@
-define("Player", ["Map"], function (Map) {
+define("Player", function () {
 
 	var heartbeatInterval = 5000;
 	var keepaliveTimeout = 30000;

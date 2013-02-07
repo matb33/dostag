@@ -1,4 +1,4 @@
-define("Weapon", ["Map", "Player", "Renderer", "Damager"], function (Map, Player, Renderer, Damager) {
+define("Weapon", ["Map", "Player"], function (Map, Player) {
 
 	var weapons = {};
 
@@ -18,9 +18,10 @@ define("Weapon", ["Map", "Player", "Renderer", "Damager"], function (Map, Player
 						map.grid,
 						pos.x,
 						pos.y,
-						Renderer,
-						Damager,
-						this.isSimulation ? setTimeout : Meteor.setTimeout
+						this.isSimulation ? setTimeout : Meteor.setTimeout,
+						this.isSimulation ? clearTimeout : Meteor.clearTimeout,
+						this.isSimulation ? setInterval : Meteor.setInterval,
+						this.isSimulation ? clearInterval : Meteor.clearInterval
 					);
 				}
 			} else {
@@ -28,18 +29,6 @@ define("Weapon", ["Map", "Player", "Renderer", "Damager"], function (Map, Player
 			}
 		}
 	});
-
-	/*
-	if (Meteor.isServer) {
-		(function () {
-		})();
-	}
-
-	if (Meteor.isClient) {
-		(function () {
-		})();
-	}
-	*/
 
 	return {
 		define: define
