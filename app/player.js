@@ -3,67 +3,35 @@ define("Player", ["Map"], function (Map) {
 	var heartbeatInterval = 5000;
 	var keepaliveTimeout = 30000;
 
-	if (Meteor.isClient) {
-		return (function () {
-
-			function getPlayerChar() {
-				return "☻";
-			}
-
-			function getOtherPlayerChar() {
-				return "☺";
-			};
-
-			function getPosition() {
-				var player = Meteor.user();
-				return player && player.position;
-			}
-
-			function setPosition(position) {
-				Meteor.users.update({_id: Meteor.userId()}, {$set: {position: position}});
-			}
-
-			function joinMapId(mapId) {
-				Meteor.users.update({_id: Meteor.userId()}, {$set: {mapId: mapId, idle: false, last_keepalive: Date.now()}});
-			}
-
-			function leaveCurrentMap() {
-				Meteor.users.update({_id: Meteor.userId()}, {$unset: {mapId: 1}});
-			}
-
-			function getJoinedMapId() {
-				var player = Meteor.user();
-				return player && player.mapId;
-			}
-
-			Meteor.startup(function () {
-				Meteor.autosubscribe(function () {
-					var player = Meteor.user();
-					if (player) {
-						Meteor.subscribe("mapUsers", player.mapId);
-						Meteor.subscribe("activeMap", player.mapId);
-					}
-				});
-			});
-
-			Meteor.setInterval(function () {
-				Meteor.call("keepalive", Meteor.userId());
-			}, heartbeatInterval);
-
-			return {
-				getPlayerChar: getPlayerChar,
-				getOtherPlayerChar: getOtherPlayerChar,
-				getPosition: getPosition,
-				setPosition: setPosition,
-				getJoinedMapId: getJoinedMapId,
-				joinMapId: joinMapId
-			};
-
-		})();
+	function getPosition() {
+		var player = Meteor.user();
+		return player && player.position;
 	}
 
+	function getJoinedMapId() {
+		var player = Meteor.user();
+		return player && player.mapId;
+	}
+
+	Meteor.methods({
+		joinMapId: function (mapId, randomizePosition) {
+			Meteor.users.update({_id: Meteor.userId()}, {$set: {
+				mapId: mapId,
+				idle: false,
+				last_keepalive: Date.now()
+			}});
+
+			if (randomizePosition) {
+				Meteor.call("moveToRandomNonCollide");
+			}
+		},
+		leaveCurrentMap: function () {
+			Meteor.users.update({_id: Meteor.userId()}, {$unset: {mapId: 1}});
+		}
+	});
+
 	if (Meteor.isServer) {
-		return (function () {
+		(function () {
 
 			function rand(limit) {
 				return Math.floor(Math.random() * limit);
@@ -137,16 +105,18 @@ define("Player", ["Map"], function (Map) {
 				});
 			}, heartbeatInterval);
 
-			// Can only modify own user record
-			Meteor.users.allow({
-				insert: function (userId) { return userId === Meteor.userId(); },
-				update: function (userId) { return userId === Meteor.userId(); },
-				remove: function (userId) { return userId === Meteor.userId(); }
-			});
-
-			Meteor.publish("mapUsers", function (mapId) {
-				return Meteor.users.find({mapId: mapId, idle: false});
-			});
 		})();
 	}
+
+	if (Meteor.isClient) {
+		Meteor.setInterval(function () {
+			Meteor.call("keepalive", Meteor.userId());
+		}, heartbeatInterval);
+	}
+
+	return {
+		getPosition: getPosition,
+		getJoinedMapId: getJoinedMapId
+	};
+
 });

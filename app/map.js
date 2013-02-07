@@ -1,66 +1,45 @@
-define("Map", function () {
-
-	var collection = new Meteor.Collection("activeMaps");
+define("Map", ["Collections"], function (Collections) {
 
 	function getMaps() {
-		return collection.find();
+		return Collections.ActiveMaps.find();
 	}
 
-	if (Meteor.isClient) {
-		return (function () {
+	function getMapById(mapId) {
+		return Collections.ActiveMaps.find({_id: mapId});
+	}
 
-			function getMap(mapId) {
-				return collection.findOne({_id: mapId});
+	function collides(map, pos) {
+		if (map) {
+			if (!map.grid) {
+				// Support passing the map id
+				map = getMapById(map);
 			}
-
-			function collides(map, pos) {
-				if (map.grid && map.grid[pos.y] && map.grid[pos.y][pos.x]) {
-					if (map.grid[pos.y][pos.x].trim() !== "") {
-						return true;
-					}
-				}
-				return false;
-			}
-
-			function getOOBChar() {
-				return "·";
-			}
-
-			function getRandomNonCollidePosition(mapId) {
-				var map = getMap(mapId), i, randPos;
-				if (map) {
-					for (i = 0; i < 5000; i++) {
-						randPos = {
-							x: Math.floor(Math.random() * map.width),
-							y: Math.floor(Math.random() * map.height)
-						};
-						if (!collides(map, randPos)) {
-							return randPos;
-						}
-					}
+			if (map.grid && map.grid[pos.y] && map.grid[pos.y][pos.x]) {
+				if (map.grid[pos.y][pos.x].trim() !== "") {
+					return true;
 				}
 			}
+		}
+		return false;
+	}
 
-			Meteor.startup(function () {
-				Meteor.subscribe("maps");
-			});
-
-			return {
-				getMap: getMap,
-				getMaps: getMaps,
-				collides: function (mapId, pos) {
-					var map = getMap(mapId);
-					return map && collides(map, pos);
-				},
-				getOOBChar: getOOBChar,
-				getRandomNonCollidePosition: getRandomNonCollidePosition
-			};
-
-		})();
+	function getRandomNonCollidePosition(mapId) {
+		var map = getMapById(mapId), i, randPos;
+		if (map) {
+			for (i = 0; i < 5000; i++) {
+				randPos = {
+					x: Math.floor(Math.random() * map.width),
+					y: Math.floor(Math.random() * map.height)
+				};
+				if (!collides(map, randPos)) {
+					return randPos;
+				}
+			}
+		}
 	}
 
 	if (Meteor.isServer) {
-		return (function () {
+		(function () {
 
 			function loadMap(content, url) {
 				var mapId, existingMap, data;
@@ -94,52 +73,39 @@ define("Map", function () {
 					height: y
 				};
 
-				existingMap = collection.findOne({url: url});
+				existingMap = Collections.ActiveMaps.findOne({url: url});
 
 				if (existingMap) {
 					mapId = existingMap._id;
-					collection.update({_id: mapId}, {$set: data});
+					Collections.ActiveMaps.update({_id: mapId}, {$set: data});
 				} else {
-					mapId = collection.insert(data);
+					mapId = Collections.ActiveMaps.insert(data);
 				}
 
 				return mapId;
 			}
-
-			function loadMapByUrl(url) {
-				var result = Meteor.http.get(url);
-				var mapId = null;
-
-				if (result.statusCode === 200) {
-					mapId = loadMap(result.content, url);
-				}
-
-				return mapId;
-			}
-
-			collection.allow({
-				insert: function (userId) { return false; },
-				update: function (userId) { return false; },
-				remove: function (userId) { return false; }
-			});
 
 			Meteor.methods({
-				"loadMapByUrl": loadMapByUrl
-			});
+				loadMapByUrl: function (url) {
+					var result = Meteor.http.get(url);
+					var mapId = null;
 
-			Meteor.publish("activeMap", function (mapId) {
-				return collection.find({_id: mapId});
-			});
+					if (result.statusCode === 200) {
+						mapId = loadMap(result.content, url);
+					}
 
-			Meteor.publish("maps", function () {
-				return getMaps();
+					return mapId;
+				}
 			});
-
-			return {
-				loadMapByUrl: loadMapByUrl
-			};
 
 		})();
 	}
+
+	return {
+		getMaps: getMaps,
+		getMapById: getMapById,
+		collides: collides,
+		getRandomNonCollidePosition: getRandomNonCollidePosition
+	};
 
 });

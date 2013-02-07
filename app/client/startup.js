@@ -1,10 +1,9 @@
-using("Map", "Player", "Projectile", function (Map, Player, Projectile) {
+(function () {
 
 	function initialize() {
 		Meteor.call("loadMapByUrl", "http://localhost:3000/maps/map1.txt", function (error, mapId) {
 			if (!error) {
-				Player.setPosition(Map.getRandomNonCollidePosition(mapId));
-				Player.joinMapId(mapId);
+				Meteor.call("joinMapId", mapId, true);
 			}
 		});
 	}
@@ -26,4 +25,4 @@ using("Map", "Player", "Projectile", function (Map, Player, Projectile) {
 		});
 	});
 
-});
+})();

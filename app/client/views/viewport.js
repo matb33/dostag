@@ -1,14 +1,11 @@
-using("Map", "Player", function (Map, Player) {
+using("Map", "Player", "Sprites", function (Map, Player, Sprites) {
 
 	var viewportCols = 80;
 	var viewportRows = 20;
 
 	Template.viewport.render = function () {
 		var mapId = Player.getJoinedMapId();
-		var map = Map.getMap(mapId);
-		var oobChar = Map.getOOBChar();
-		var playerChar = Player.getPlayerChar();
-		var otherPlayerChar = Player.getOtherPlayerChar();
+		var map = Map.getMapById(mapId);
 		var pos, x1, x2, y1, y2, x, y, players, others = {}, output = "";
 
 		if (map) {
@@ -34,15 +31,15 @@ using("Map", "Player", function (Map, Player) {
 					for (x = x1; x < x2; x++) {
 						if (x < 0 || x >= map.width || y < 0 || y >= map.height) {
 							// Render out-of-bounds
-							output += oobChar;
+							output += Sprites.Map.OOB;
 						} else {
 							if (x == pos.x && y == pos.y) {
 								// Render player
-								output += playerChar;
+								output += Sprites.Player.YOU;
 							} else {
 								if (others[y] && others[y][x]) {
 									// Render other player
-									output += otherPlayerChar;
+									output += Sprites.Player.OTHER;
 								} else {
 									// Render map
 									output += map.grid[y][x];
@@ -57,34 +54,5 @@ using("Map", "Player", function (Map, Player) {
 
 		return output;
 	};
-
-	var hasRendered = false;
-	Template.viewport.rendered = function () {
-		if (!hasRendered) {
-			hasRendered = true;
-			bindKeys();
-		}
-	};
-
-	function bindKeys() {
-		$(document).keydown(function (evt) {
-			var pos = Player.getPosition();
-			var mapId = Player.getJoinedMapId();
-
-			if (pos && mapId) {
-				switch (evt.keyCode) {
-					case 37: pos.x -= 1; break;		// right
-					case 38: pos.y -= 1; break;		// up
-					case 39: pos.x += 1; break;		// left
-					case 40: pos.y += 1; break;		// down
-				}
-				if (!Map.collides(mapId, pos)) {
-					Player.setPosition(pos);
-				}
-			}
-
-			return false;
-		});
-	}
 
 });
