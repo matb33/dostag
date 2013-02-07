@@ -8,6 +8,14 @@ using("Map", "Player", "Sprites", function (Map, Player, Sprites) {
 		var map = Map.getMapById(mapId);
 		var pos, x1, x2, y1, y2, x, y, players, others = {}, output = "";
 
+		output += "\n";
+		output += "      ____   ____  _____ ______ ___    ______  \n";
+		output += "     / __ \\ / __ \\/ ___//_  __//   |  / ____/  \n";
+		output += "    / / / // / / /\\__ \\  / /  / /| | / / __    \n";
+		output += "   / /_/ // /_/ /___/ / / /  / ___ |/ /_/ /    \n";
+		output += "  /_____/ \\____//____/ /_/  /_/  |_|\\____/     \n";
+		output += "\n\n";
+
 		if (map && map.grid) {
 			pos = Player.getPosition();
 
@@ -26,6 +34,8 @@ using("Map", "Player", "Sprites", function (Map, Player, Sprites) {
 				x2 = pos.x + (viewportCols / 2);
 				y1 = pos.y - (viewportRows / 2);
 				y2 = pos.y + (viewportRows / 2);
+
+				output = "";
 
 				for (y = y1; y < y2; y++) {
 					for (x = x1; x < x2; x++) {
