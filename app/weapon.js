@@ -1,42 +1,44 @@
-define("Weapon", ["Map", "Player"], function (Map, Player) {
+define("Weapon", ["Activity"], function (Activity) {
 
-	var weapons = {};
+	var defs = {};
 
-	function define(id, initial, resupply, sprite, sequence) {
-		weapons[id] = {
-			initial: initial,
-			resupply: resupply,
-			sprite: sprite,
-			sequence: sequence
+	function define(def) {
+		if (typeof def.id === "undefined") throw new Error("Weapon definition missing 'id'");
+		if (typeof def.initial === "undefined") throw new Error("Weapon definition missing 'initial'");
+		if (typeof def.resupply === "undefined") throw new Error("Weapon definition missing 'resupply'");
+		if (typeof def.inventorySprite === "undefined") throw new Error("Weapon definition missing 'inventorySprite'");
+		if (defs[def.id]) throw new Error("Weapon '" + def.id + "' already defined");
+
+		defs[def.id] = def;
+	}
+
+	function getInitialInventory() {
+		return {};	// TODO, write this based on weapon def
+	}
+
+	function trigger(id) {
+		if (defs[id]) {
+			Meteor.call("pushActivity", {
+				module: "Weapon",
+				data: id
+			});
+		} else {
+			throw new Error("Invalid weapon type: " + id);
 		}
 	}
 
-	Meteor.methods({
-		triggerWeapon: function (id) {
-			var mapId = Player.getJoinedMapId(this.userId);
-			var map = Map.getMapById(mapId);
-			var pos = Player.getPosition();
-
-			if (weapons[id]) {
-				if (typeof weapons[id].sequence === "function") {
-					weapons[id].sequence.call(this, map, pos.x, pos.y,
-						this.isSimulation ? setTimeout : Meteor.setTimeout,
-						this.isSimulation ? clearTimeout : Meteor.clearTimeout,
-						this.isSimulation ? setInterval : Meteor.setInterval,
-						this.isSimulation ? clearInterval : Meteor.clearInterval
-					);
-				} else {
-					throw new Error("Missing weapon sequence function: " + id);
-				}
-			} else {
-				throw new Error("Invalid weapon type: " + id);
-			}
+	function processActivity(next) {
+		if (typeof defs[this.data].sequence === "function") {
+			defs[this.data].sequence.call(this, next);
 		}
-	});
+	}
 
 	return {
 		define: define,
-		defs: weapons
+		trigger: trigger,
+		defs: defs,
+		getInitialInventory: getInitialInventory,
+		processActivity: processActivity
 	};
 
 });

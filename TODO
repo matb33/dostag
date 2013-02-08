@@ -17,7 +17,8 @@ TODO:
  ☐ make the default map much bigger and more interesting
  ☐ rename "grid" layer to "map"
  ☐ consider renaming Sprites module to Sprite, to match all other modules
-
+ ☐ convert to Activity collection instead of rendering weapons in map layer
+ ☐ consider abstracting Meteor.users in Player module
 
 LONG TERM:
  ☐ consider an instance system, possibly with a separate server-browser Meteor app that can see the various game servers? dostag.meteor.com would see dostag01.meteor.com, dostag02.meteor.com, etc

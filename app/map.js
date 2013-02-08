@@ -1,11 +1,30 @@
-define("Map", ["Collections", "Player", "LayerOps"], function (Collections, Player, LayerOps) {
+define("Map", ["Collections", "Player", "LayerOps", "Weapon"], function (Collections, Player, LayerOps, Weapon) {
+
+	var SERVER_LAYER = 1;
+	var CLIENT_LAYER = 2;
+
+	var LAYER_LEVEL = "Yl";
+	var LAYER_DAMAGE = "Yd";
+	var LAYER_WEAPONS = "Yw";
+	var LAYER_CHATTER = "Yc";
+
+	var LAYER_LOCATIONS = {};
+
+	LAYER_LOCATIONS[LAYER_LEVEL] = SERVER_LAYER;
+	LAYER_LOCATIONS[LAYER_DAMAGE] = SERVER_LAYER;
+	LAYER_LOCATIONS[LAYER_WEAPONS] = CLIENT_LAYER;
+	LAYER_LOCATIONS[LAYER_CHATTER] = CLIENT_LAYER;
 
 	function getMaps() {
-		return Collections.ActiveMaps.find();
+		return Collections.Maps.find();
 	}
 
 	function getMapById(mapId) {
-		return Collections.ActiveMaps.findOne({_id: mapId});
+		return Collections.Maps.findOne({_id: mapId});
+	}
+
+	function getClientLayers() {
+		return Collections.ClientLayers.findOne();
 	}
 
 	function isTraversable(c) {
@@ -15,15 +34,15 @@ define("Map", ["Collections", "Player", "LayerOps"], function (Collections, Play
 	function collides(map, pos) {
 		var key;
 		if (map) {
-			if (!map.level) {
+			if (!map._id) {
 				map = getMapById(map);	// Support passing the map id
 			}
 			if (pos.x < 0 || pos.y < 0 || pos.x >= map.width || pos.y >= map.height) {
 				return true;
 			}
-			key = pos.y + "_" + pos.x;
-			if (map.level && map.level[key]) {
-				if (!isTraversable(map.level[key])) {
+			key = LAYER_LEVEL + pos.y + "_" + pos.x;
+			if (map[key]) {
+				if (!isTraversable(map[key])) {
 					return true;
 				}
 			}
@@ -46,53 +65,64 @@ define("Map", ["Collections", "Player", "LayerOps"], function (Collections, Play
 		}
 	}
 
-	function layerAdd(layer, sx, sy, text) {
-		if (!this.userId) throw new Error("You must use layerAdd.call syntax originating from within the context of Meteor.methods");
+	function getLayer(name) {
+		if (LAYER_LOCATIONS[name] === SERVER_LAYER) {
+			if (!this.userId) throw new Error("You must use call syntax originating from within the context of Meteor.methods");
+			return {
+				collection: Collections.Maps,
+				doc: getMapById(Player.getJoinedMapId(this.userId))
+			};
+		}
 
-		var mapId = Player.getJoinedMapId(this.userId);
-		var map = getMapById(mapId);
-		var set = {};
-
-		set[layer] = LayerOps.add(sx, sy, text, map[layer]);
-
-		Collections.ActiveMaps.update({_id: mapId}, {$set: set});
+		if (LAYER_LOCATIONS[name] === CLIENT_LAYER) {
+			return {
+				collection: Collections.ClientLayers,
+				doc: getClientLayers()
+			};
+		}
 	}
 
-	function layerSub(layer, sx, sy, text) {
-		if (!this.userId) throw new Error("You must use layerSub.call syntax originating from within the context of Meteor.methods");
-
-		var mapId = Player.getJoinedMapId(this.userId);
-		var map = getMapById(mapId);
-		var set = {};
-
-		set[layer] = LayerOps.sub(sx, sy, text, map[layer]);
-
-		Collections.ActiveMaps.update({_id: mapId}, {$set: set});
+	function layerAdd(layerName, x, y, text) {
+		var layer = getLayer.call(this, layerName);
+		var set = LayerOps.add(layerName, x, y, text);
+		layer.collection.update({_id: layer.doc._id}, {$set: set});
 	}
 
-	function layerClear(layer) {
-		if (!this.userId) throw new Error("You must use layerClear.call syntax originating from within the context of Meteor.methods");
+	function layerSub(layerName, x, y, text) {
+		var layer = getLayer.call(this, layerName);
+		var set = LayerOps.sub(layerName, x, y, text);
+		layer.collection.update({_id: layer.doc._id}, {$set: set});
+	}
 
-		var mapId = Player.getJoinedMapId(this.userId);
-		var map = getMapById(mapId);
-		var set = {};
-
-		set[layer] = LayerOps.generateNullGridObject(map.width, map.height);
-
-		Collections.ActiveMaps.update({_id: mapId}, {$set: set});
+	function layerClear(layerName) {
+		var layer = getLayer.call(this, layerName);
+		var set = LayerOps.generateNullGridObject(layerName, layer.doc.width, layer.doc.height);
+		layer.collection.update({_id: layer.doc._id}, {$set: set});
 	}
 
 	Meteor.methods({
 		joinMapId: function (mapId, randomizePosition) {
 			var map = getMapById(mapId);
+			var inventory, data = {};
 
 			if (map) {
 				Meteor.users.update({_id: this.userId}, {$set: {
 					mapId: mapId,
 					idle: false,
 					last_keepalive: Date.now(),
-					inventory: {} /* TODO: fill this with defaults */
+					inventory: Weapon.getInitialInventory()
 				}});
+
+				// Always only a single document in this collection for
+				// performance reasons
+				data = _.extend(data, LayerOps.generateNullGridObject(LAYER_WEAPONS, map.width, map.height));
+				data = _.extend(data, LayerOps.generateNullGridObject(LAYER_CHATTER, map.width, map.height));
+				Collections.ClientLayers.remove({});
+				Collections.ClientLayers.insert(data);
+
+				// Clean-up any activities you may have left behind
+				// in this map or another
+				Collections.Activities.remove({userId: this.userId});
 
 				if (randomizePosition) {
 					Meteor.call("moveToRandomNonCollide");
@@ -101,6 +131,7 @@ define("Map", ["Collections", "Player", "LayerOps"], function (Collections, Play
 		},
 		leaveCurrentMap: function () {
 			Meteor.users.update({_id: this.userId}, {$unset: {mapId: 1}});
+			Collections.Activities.remove({userId: this.userId});
 		}
 	});
 
@@ -108,31 +139,30 @@ define("Map", ["Collections", "Player", "LayerOps"], function (Collections, Play
 		(function () {
 
 			function loadMap(content, url) {
-				var mapId, existingMap, data, x, y;
+				var mapId, existingMap;
 
-				var result = LayerOps.mapStringToGridObject(content);
-				var weapons = LayerOps.generateNullGridObject(result.width, result.height);
-				var chatter = LayerOps.generateNullGridObject(result.width, result.height);
-
-				data = {
+				var data = {
 					url: url,
-					content: content,
-					level: result.grid,
-					weapons: weapons,
-					chatter: chatter,
-					width: result.width,
-					height: result.height
+					content: content
 				};
 
-				existingMap = Collections.ActiveMaps.findOne({url: url});
+				var levelLayer = LayerOps.mapStringToGridObject(LAYER_LEVEL, content);
+				var damageLayer = LayerOps.generateNullGridObject(LAYER_DAMAGE, levelLayer.width, levelLayer.height);
+
+				data = _.extend(data, levelLayer);
+				data = _.extend(data, damageLayer);
+
+				existingMap = Collections.Maps.findOne({url: url});
 
 				if (existingMap) {
 					mapId = existingMap._id;
 					// TODO: This update should eventually be removed in favor of resetting the map by reading in the "content" field
-					Collections.ActiveMaps.update({_id: mapId}, {$set: data});
+					Collections.Maps.update({_id: mapId}, {$set: data});
 				} else {
-					mapId = Collections.ActiveMaps.insert(data);
+					mapId = Collections.Maps.insert(data);
 				}
+
+				Collections.Activities.remove({mapId: mapId});
 
 				return mapId;
 			}
@@ -159,10 +189,16 @@ define("Map", ["Collections", "Player", "LayerOps"], function (Collections, Play
 		isTraversable: isTraversable,
 		collides: collides,
 		getRandomNonCollidePosition: getRandomNonCollidePosition,
+		getClientLayers: getClientLayers,
 
 		layerAdd: layerAdd,
 		layerSub: layerSub,
-		layerClear: layerClear
+		layerClear: layerClear,
+
+		LAYER_LEVEL: LAYER_LEVEL,
+		LAYER_DAMAGE: LAYER_DAMAGE,
+		LAYER_WEAPONS: LAYER_WEAPONS,
+		LAYER_CHATTER: LAYER_CHATTER
 	};
 
 });

@@ -1,3 +1,4 @@
+	/*
 define("Stats", ["Weapon", "Sprite", "Player", "Map", "LayerOps"], function (Weapon, Sprite, Player, Map, LayerOps) {
 
 	function getStats(player) {
@@ -15,7 +16,6 @@ define("Stats", ["Weapon", "Sprite", "Player", "Map", "LayerOps"], function (Wea
 		};
 	}
 
-	/*
 	// Continue this... it's super slow atm =(
 	// Consider just doing this outside the DOS box
 	Meteor.startup(function () {
@@ -40,13 +40,13 @@ define("Stats", ["Weapon", "Sprite", "Player", "Map", "LayerOps"], function (Wea
 					render += str_repeat("─", line.length) + "╮\n";
 					render += line + "│";
 
-					hud = LayerOps.mapStringToGridObject(render);
+					hud = LayerOps.mapStringToGridObject("", render);
 
 					Session.set("hud", hud);
 				}
 			}
 		});
 	});
-	*/
 
 });
+	*/

@@ -1,34 +1,64 @@
-using("Weapon", "Map", "Damager", "Sprite", function (Weapon, Map, Damager, Sprite) {
+using("Weapon", "Map", "Player", "Sprite", function (Weapon, Map, Player, Sprite) {
 
-	function pickaxe(map, ox, oy, setTimeout, clearTimeout, setInterval, clearInterval, offset) {
+	function pickaxe(offset, next) {
 		var self = this;
-		var x = ox + offset.x;
-		var y = oy + offset.y;
+		var pos = Player.getPosition(self.userId);
+		var x = pos.x + offset.x;
+		var y = pos.y + offset.y;
 
-		Map.layerAdd.call(self, "weapons", x, y, Sprite.Weapon.PICKAXE);
-		Map.layerAdd.call(self, "level", x, y, " ");
-		Damager.add.call(self, x, y, Sprite.Weapon.PICKAXE);
+		var _setTimeout = Meteor.isClient ? window.setTimeout : Meteor.setTimeout;
 
-		setTimeout(function () {
-			Map.layerSub.call(self, "weapons", x, y, Sprite.Weapon.PICKAXE);
-			Damager.sub.call(self, x, y, Sprite.Weapon.PICKAXE);
+		if (Meteor.isClient) {
+			Map.layerAdd.call(self, Map.LAYER_WEAPONS, x, y, Sprite.Weapon.PICKAXE);
+		} else {
+			Map.layerAdd.call(self, Map.LAYER_DAMAGE, x, y, Sprite.Weapon.PICKAXE);
+		}
+
+		Map.layerAdd.call(self, Map.LAYER_LEVEL, x, y, " ");
+
+		_setTimeout(function () {
+			if (Meteor.isClient) {
+				Map.layerSub.call(self, Map.LAYER_WEAPONS, x, y, Sprite.Weapon.PICKAXE);
+			} else {
+				Map.layerSub.call(self, Map.LAYER_DAMAGE, x, y, Sprite.Weapon.PICKAXE);
+			}
+
+			next();
 		}, 50);
 	}
 
-	Weapon.define("pickaxe_u", -1, 0, Sprite.Weapon.PICKAXE, function () {
-		pickaxe.apply(this, Array.prototype.slice.call(arguments).concat([{ x: 0, y: -1 }]));
-	});
+	var options = {
+		initial: -1,
+		resupply: 0,
+		inventorySprite: Sprite.Weapon.PICKAXE
+	};
 
-	Weapon.define("pickaxe_d", -1, 0, Sprite.Weapon.PICKAXE, function () {
-		pickaxe.apply(this, Array.prototype.slice.call(arguments).concat([{ x: 0, y: 1 }]));
-	});
+	Weapon.define(_.extend({
+		id: "pickaxe_u",
+		sequence: function (next) {
+			pickaxe.call(this, { x: 0, y: -1 }, next);
+		}
+	}, options));
 
-	Weapon.define("pickaxe_l", -1, 0, Sprite.Weapon.PICKAXE, function () {
-		pickaxe.apply(this, Array.prototype.slice.call(arguments).concat([{ x: -1, y: 0 }]));
-	});
+	Weapon.define(_.extend({
+		id: "pickaxe_d",
+		sequence: function (next) {
+			pickaxe.call(this, { x: 0, y: 1 }, next);
+		}
+	}, options));
 
-	Weapon.define("pickaxe_r", -1, 0, Sprite.Weapon.PICKAXE, function () {
-		pickaxe.apply(this, Array.prototype.slice.call(arguments).concat([{ x: 1, y: 0 }]));
-	});
+	Weapon.define(_.extend({
+		id: "pickaxe_l",
+		sequence: function (next) {
+			pickaxe.call(this, { x: -1, y: 0 }, next);
+		}
+	}, options));
+
+	Weapon.define(_.extend({
+		id: "pickaxe_r",
+		sequence: function (next) {
+			pickaxe.call(this, { x: 1, y: 0 }, next);
+		}
+	}, options));
 
 });

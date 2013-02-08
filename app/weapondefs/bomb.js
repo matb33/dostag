@@ -1,15 +1,15 @@
-using("Weapon", "Map", "Damager", "Sprite", function (Weapon, Map, Damager, Sprite) {
+using("Weapon", "Map", "Player", "Sprite", function (Weapon, Map, Player, Sprite) {
 
 	var f1 = {
 		x: 0,
 		y: 0,
-		t: "#"
+		m: "#"
 	};
 
 	var f2 = {
 		x: -1,
 		y: -1,
-		t: 	"`#`\n" +
+		m: 	"`#`\n" +
 			"###\n" +
 			"`#`"
 	};
@@ -17,7 +17,7 @@ using("Weapon", "Map", "Damager", "Sprite", function (Weapon, Map, Damager, Spri
 	var f3 = {
 		x: -2,
 		y: -2,
-		t: 	"``#``\n" +
+		m: 	"``#``\n" +
 			"`###`\n" +
 			"#####\n" +
 			"`###`\n" +
@@ -27,7 +27,7 @@ using("Weapon", "Map", "Damager", "Sprite", function (Weapon, Map, Damager, Spri
 	var f4 = {
 		x: -3,
 		y: -3,
-		t: 	"```#```\n" +
+		m: 	"```#```\n" +
 			"``###``\n" +
 			"`#####`\n" +
 			"#######\n" +
@@ -36,38 +36,53 @@ using("Weapon", "Map", "Damager", "Sprite", function (Weapon, Map, Damager, Spri
 			"```#```"
 	};
 
-	f1.t = f1.t.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
-	f2.t = f2.t.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
-	f3.t = f3.t.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
-	f4.t = f4.t.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
+	var hole = f4.m.replace(new RegExp("#", "g"), " ");
 
-	Weapon.define("bomb", 5, 5000, Sprite.Weapon.BOMB, function (map, ox, oy, setTimeout, clearTimeout, setInterval, clearInterval) {
-		var self = this;
+	f1.explosion = f1.m.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
+	f2.explosion = f2.m.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
+	f3.explosion = f3.m.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
+	f4.explosion = f4.m.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
 
-		setTimeout(function () {
-			Map.layerAdd.call(self, "weapons", ox + f1.x, oy + f1.y, f1.t);
-			Damager.add.call(self, ox + f1.x, oy + f1.y, f1.t);
+	Weapon.define({
+		id: "bomb",
+		initial: 5,
+		resupply: 5000,
+		inventorySprite: Sprite.Weapon.BOMB,
+		sequence: function (next) {
+			var self = this;
+			var pos = Player.getPosition(this.userId);
+			var x = pos.x, y = pos.y;
+			var _setTimeout = Meteor.isClient ? window.setTimeout : Meteor.setTimeout;
 
-			setTimeout(function () {
-				Map.layerAdd.call(self, "weapons", ox + f2.x, oy + f2.y, f2.t);
-				Damager.add.call(self, ox + f2.x, oy + f2.y, f2.t);
+			_setTimeout(function () {
+				if (Meteor.isClient) { Map.layerAdd.call(self, Map.LAYER_WEAPONS, x + f1.x, y + f1.y, f1.explosion); }
+				else { Map.layerAdd.call(self, Map.LAYER_DAMAGE, x + f1.x, y + f1.y, f1.explosion); }
 
-				setTimeout(function () {
-					Map.layerAdd.call(self, "weapons", ox + f3.x, oy + f3.y, f3.t);
-					Damager.add.call(self, ox + f3.x, oy + f3.y, f3.t);
+				_setTimeout(function () {
+					if (Meteor.isClient) { Map.layerAdd.call(self, Map.LAYER_WEAPONS, x + f2.x, y + f2.y, f2.explosion); }
+					else { Map.layerAdd.call(self, Map.LAYER_DAMAGE, x + f2.x, y + f2.y, f2.explosion); }
 
-					setTimeout(function () {
-						Map.layerAdd.call(self, "weapons", ox + f4.x, oy + f4.y, f4.t);
-						Damager.add.call(self, ox + f4.x, oy + f4.y, f4.t);
+					_setTimeout(function () {
+						if (Meteor.isClient) { Map.layerAdd.call(self, Map.LAYER_WEAPONS, x + f3.x, y + f3.y, f3.explosion); }
+						else { Map.layerAdd.call(self, Map.LAYER_DAMAGE, x + f3.x, y + f3.y, f3.explosion); }
 
-						setTimeout(function () {
-							Map.layerSub.call(self, "weapons", ox + f4.x, oy + f4.y, f4.t);
-							Damager.sub.call(self, ox + f4.x, oy + f4.y, f4.t);
-						}, 500);
+						_setTimeout(function () {
+							if (Meteor.isClient) { Map.layerAdd.call(self, Map.LAYER_WEAPONS, x + f4.x, y + f4.y, f4.explosion); }
+							else { Map.layerAdd.call(self, Map.LAYER_DAMAGE, x + f4.x, y + f4.y, f4.explosion); }
+
+							_setTimeout(function () {
+								if (Meteor.isClient) { Map.layerSub.call(self, Map.LAYER_WEAPONS, x + f4.x, y + f4.y, f4.explosion); }
+								else { Map.layerSub.call(self, Map.LAYER_DAMAGE, x + f4.x, y + f4.y, f4.explosion); }
+
+								Map.layerAdd.call(self, Map.LAYER_LEVEL, x + f4.x, y + f4.y, hole);
+
+								next();
+							}, 500);
+						}, 40);
 					}, 40);
 				}, 40);
-			}, 40);
-		}, 2000);
+			}, 2000);
+		}
 	});
 
 });

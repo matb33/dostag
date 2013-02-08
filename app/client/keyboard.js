@@ -1,4 +1,4 @@
-using("Chat", function (Chat) {
+using("Chat", "Weapon", function (Chat, Weapon) {
 
 	Meteor.startup(function () {
 		$(document).keydown(function (evt) {
@@ -12,7 +12,7 @@ using("Chat", function (Chat) {
 				case 40: direction = 4; break;			// down
 
 				case 66: weapon = "bomb"; break;		// b
-				//case 78: weapon = "napalm"; break;		// n
+				//case 78: weapon = "napalm"; break;		// n (currently disabled, too slow)
 
 				case 87: weapon = "pickaxe_u"; break;	// w
 				case 83: weapon = "pickaxe_d"; break;	// s
@@ -20,7 +20,7 @@ using("Chat", function (Chat) {
 				case 68: weapon = "pickaxe_r"; break;	// d
 
 				case 13:
-					Chat.prompt();
+					Chat.prompt("Say what?");
 				break;
 			}
 
@@ -29,7 +29,7 @@ using("Chat", function (Chat) {
 			}
 
 			if (weapon) {
-				Meteor.call("triggerWeapon", weapon);
+				Weapon.trigger(weapon);
 			}
 
 			return false;

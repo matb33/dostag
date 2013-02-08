@@ -1,14 +1,12 @@
 using("Collections", function (Collections) {
 
 	// Active map data can not be modified directly by the client
-	Collections.ActiveMaps.allow({
+	Collections.Maps.allow({
 		insert: function () {
 			return false;
 		},
 		update: function (userId, docs, fields) {
-			// TODO: Figure out how we can do this better... this gives the client
-			// full access to mess with the various layers
- 			return _.contains(fields, "level") || _.contains(fields, "chatter") || _.contains(fields, "weapons");
+ 			return false;
 		},
 		remove: function () {
 			return false;
@@ -18,8 +16,21 @@ using("Collections", function (Collections) {
 	// Users aren't allowed to modify their own positions directly
 	Meteor.users.deny({
 		update: function (userId, docs, fields) {
+			// TODO: is this even working? double-check that this is getting called
 			return _.contains(fields, "position");
 		}
 	});
 
+	// Activity can't be modified directly, use the various Meteor.methods
+	Collections.Activities.allow({
+		insert: function () {
+			return false;
+		},
+		update: function () {
+ 			return false;
+		},
+		remove: function (userId, docs) {
+			return false;
+		}
+	});
 });

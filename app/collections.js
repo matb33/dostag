@@ -2,8 +2,9 @@ define("Collections", function (Collections) {
 
 	var Collections = {};
 
-	Collections.ActiveMaps = new Meteor.Collection("activeMaps");
-	Collections.Weapons = new Meteor.Collection("weapons");
+	Collections.Maps = new Meteor.Collection("maps");
+	Collections.Activities = new Meteor.Collection("activities");
+	Collections.ClientLayers = new Meteor.Collection(null);
 
 	return Collections;
 
