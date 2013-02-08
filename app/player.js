@@ -17,23 +17,6 @@ define("Player", function () {
 		return player && player.mapId;
 	}
 
-	Meteor.methods({
-		joinMapId: function (mapId, randomizePosition) {
-			Meteor.users.update({_id: this.userId}, {$set: {
-				mapId: mapId,
-				idle: false,
-				last_keepalive: Date.now()
-			}});
-
-			if (randomizePosition) {
-				Meteor.call("moveToRandomNonCollide");
-			}
-		},
-		leaveCurrentMap: function () {
-			Meteor.users.update({_id: this.userId}, {$unset: {mapId: 1}});
-		}
-	});
-
 	if (Meteor.isServer) {
 		(function () {
 

@@ -2,8 +2,13 @@ define("Weapon", ["Map", "Player"], function (Map, Player) {
 
 	var weapons = {};
 
-	function define(id, sequence) {
-		weapons[id] = sequence;
+	function define(id, initial, resupply, sprite, sequence) {
+		weapons[id] = {
+			initial: initial,
+			resupply: resupply,
+			sprite: sprite,
+			sequence: sequence
+		}
 	}
 
 	Meteor.methods({
@@ -13,16 +18,15 @@ define("Weapon", ["Map", "Player"], function (Map, Player) {
 			var pos = Player.getPosition();
 
 			if (weapons[id]) {
-				if (map.grid) {
-					weapons[id].call(this,
-						map.grid,
-						pos.x,
-						pos.y,
+				if (typeof weapons[id].sequence === "function") {
+					weapons[id].sequence.call(this, map, pos.x, pos.y,
 						this.isSimulation ? setTimeout : Meteor.setTimeout,
 						this.isSimulation ? clearTimeout : Meteor.clearTimeout,
 						this.isSimulation ? setInterval : Meteor.setInterval,
 						this.isSimulation ? clearInterval : Meteor.clearInterval
 					);
+				} else {
+					throw new Error("Missing weapon sequence function: " + id);
 				}
 			} else {
 				throw new Error("Invalid weapon type: " + id);
@@ -31,7 +35,8 @@ define("Weapon", ["Map", "Player"], function (Map, Player) {
 	});
 
 	return {
-		define: define
+		define: define,
+		defs: weapons
 	};
 
 });

@@ -1,0 +1,23 @@
+TODO:
+ ☐ implement an intro screen that shows instructions, possibly allowing you to change your username
+ ✔ allow chat bubbles @done (13-02-07 22:13)
+ ☐ implement a stat bar in a corner that shows:
+   ☐ remaining bombs
+   ☐ # of players
+   ☐ ping?
+ ☐ have bombs limited and resupply at a given rate
+ ☐ allow user to load a new map via URL
+ ☐ allow user to see other actively loaded maps on same server, and switch
+ ☐ setup the game to be in "rounds", where you can't just join a game mid-way, you have to wait until someone wins to join the match (observe mode)
+ ☐ as soon as there is more than one player in a map, the round begins
+ ☐ perhaps show basic controls somewhere, off the dos box
+ ☐ setup the Damager module
+ ☐ have the new round event perform the reset on the map, where map content is re-exported to grid format
+ ☐ measure data going over-the-wire for various layers. Is the [y + "_" + x] strategy working? Should we revert back to [y][x]? Or perhaps we even flatten it further and put it right in the root of the document, like ["layername_" + y + "_" + "x"]
+ ☐ make the default map much bigger and more interesting
+ ☐ rename "grid" layer to "map"
+ ☐ consider renaming Sprites module to Sprite, to match all other modules
+
+
+LONG TERM:
+ ☐ consider an instance system, possibly with a separate server-browser Meteor app that can see the various game servers? dostag.meteor.com would see dostag01.meteor.com, dostag02.meteor.com, etc

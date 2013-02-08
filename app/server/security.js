@@ -1,15 +1,14 @@
 using("Collections", function (Collections) {
 
 	// Active map data can not be modified directly by the client
-	// However, we are allowing the client to modify the overlay property
 	Collections.ActiveMaps.allow({
 		insert: function () {
 			return false;
 		},
 		update: function (userId, docs, fields) {
 			// TODO: Figure out how we can do this better... this gives the client
-			// full access to mess with the grid and overlay
-			return _.contains(fields, "overlay") || _.contains(fields, "grid");
+			// full access to mess with the various layers
+ 			return _.contains(fields, "level") || _.contains(fields, "chatter") || _.contains(fields, "weapons");
 		},
 		remove: function () {
 			return false;

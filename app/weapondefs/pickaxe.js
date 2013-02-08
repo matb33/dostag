@@ -1,33 +1,33 @@
-using("Weapon", "Map", "Damager", "Sprites", function (Weapon, Map, Damager, Sprites) {
+using("Weapon", "Map", "Damager", "Sprite", function (Weapon, Map, Damager, Sprite) {
 
-	function pickaxe(grid, ox, oy, setTimeout, clearTimeout, setInterval, clearInterval, offset) {
+	function pickaxe(map, ox, oy, setTimeout, clearTimeout, setInterval, clearInterval, offset) {
 		var self = this;
 		var x = ox + offset.x;
 		var y = oy + offset.y;
 
-		Map.addOverlay.call(self, x, y, Sprites.Weapon.PICKAXE);
-		Map.replace.call(self, x, y, " ");
-		Damager.add.call(self, x, y, Sprites.Weapon.PICKAXE);
+		Map.layerAdd.call(self, "weapons", x, y, Sprite.Weapon.PICKAXE);
+		Map.layerAdd.call(self, "level", x, y, " ");
+		Damager.add.call(self, x, y, Sprite.Weapon.PICKAXE);
 
 		setTimeout(function () {
-			Map.subOverlay.call(self, x, y, Sprites.Weapon.PICKAXE);
-			Damager.sub.call(self, x, y, Sprites.Weapon.PICKAXE);
+			Map.layerSub.call(self, "weapons", x, y, Sprite.Weapon.PICKAXE);
+			Damager.sub.call(self, x, y, Sprite.Weapon.PICKAXE);
 		}, 50);
 	}
 
-	Weapon.define("pickaxe_u", function () {
+	Weapon.define("pickaxe_u", -1, 0, Sprite.Weapon.PICKAXE, function () {
 		pickaxe.apply(this, Array.prototype.slice.call(arguments).concat([{ x: 0, y: -1 }]));
 	});
 
-	Weapon.define("pickaxe_d", function () {
+	Weapon.define("pickaxe_d", -1, 0, Sprite.Weapon.PICKAXE, function () {
 		pickaxe.apply(this, Array.prototype.slice.call(arguments).concat([{ x: 0, y: 1 }]));
 	});
 
-	Weapon.define("pickaxe_l", function () {
+	Weapon.define("pickaxe_l", -1, 0, Sprite.Weapon.PICKAXE, function () {
 		pickaxe.apply(this, Array.prototype.slice.call(arguments).concat([{ x: -1, y: 0 }]));
 	});
 
-	Weapon.define("pickaxe_r", function () {
+	Weapon.define("pickaxe_r", -1, 0, Sprite.Weapon.PICKAXE, function () {
 		pickaxe.apply(this, Array.prototype.slice.call(arguments).concat([{ x: 1, y: 0 }]));
 	});
 

@@ -1,8 +1,10 @@
-using("Weapon", "Map", "Damager", "Sprites", function (Weapon, Map, Damager, Sprites) {
+using("Weapon", "Map", "Damager", "Sprite", function (Weapon, Map, Damager, Sprite) {
 
-	// NOTE: This weapon definition is a work in progress. It's currently waaaaay too CPU intensive.
+	// NOTE: This weapon definition is a work in progress. It's currently
+	// far too chatty and causes major slowdowns
+	return;
 
-	Weapon.define("napalm", function (grid, ox, oy, setTimeout, clearTimeout, setInterval, clearInterval) {
+	Weapon.define("napalm", 3, 10000, Sprite.Weapon.NAPALM, function (map, ox, oy, setTimeout, clearTimeout, setInterval, clearInterval) {
 		var self = this;
 
 		function Spread(direction, speed) {
@@ -19,11 +21,13 @@ using("Weapon", "Map", "Damager", "Sprites", function (Weapon, Map, Damager, Spr
 					case 3: that.x -= 1; break;
 					case 4: that.x += 1; break;
 				}
-				if (Map.isTraversable(grid[that.y + "_" + that.x])) {
+				if (Map.isTraversable(map.level[that.y + "_" + that.x])) {
 					if (that.mode === 0) {
-						Map.addOverlay.call(self, that.x, that.y, Sprites.Weapon.NAPALM);
+						Map.layerAdd.call(self, "weapons", that.x, that.y, Sprite.Weapon.FIRE);
+						Damager.add(self, that.x, that.y, Sprite.Weapon.FIRE);
 					} else {
-						Map.subOverlay.call(self, that.x, that.y, Sprites.Weapon.NAPALM);
+						Map.layerSub.call(self, "weapons", that.x, that.y, Sprite.Weapon.FIRE);
+						Damager.sub(self, that.x, that.y, Sprite.Weapon.FIRE);
 					}
 				} else {
 					if (that.mode === 0) {
@@ -38,10 +42,10 @@ using("Weapon", "Map", "Damager", "Sprites", function (Weapon, Map, Damager, Spr
 		}
 
 		setTimeout(function () {
-			var up = new Spread(1, 50);
-			var down = new Spread(2, 50);
-			var left = new Spread(3, 50);
-			var right = new Spread(4, 50);
+			new Spread(1, 50);
+			new Spread(2, 50);
+			new Spread(3, 50);
+			new Spread(4, 50);
 		}, 2000);
 	});
 
