@@ -21,7 +21,11 @@ using("Collections", "Map", function (Collections, Map) {
 
 			Meteor.publish("mapActivities", function (mapId) {
 				return Collections.Activities.find({mapId: mapId});
-			})
+			});
+
+			Meteor.publish("layerOverlay", function (mapId) {
+				return Collections.LayerOverlay.find({mapId: mapId});
+			});
 		}
 
 		// =====================================================================
@@ -37,6 +41,7 @@ using("Collections", "Map", function (Collections, Map) {
 					Meteor.subscribe("mapUsers", player.mapId);
 					Meteor.subscribe("activeMap", player.mapId);
 					Meteor.subscribe("mapActivities", player.mapId);
+					Meteor.subscribe("layerOverlay", player.mapId);
 				}
 			});
 		}

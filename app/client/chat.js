@@ -1,4 +1,4 @@
-define("Chat", ["Map", "Player", "Activity"], function (Map, Player, Activity) {
+define("Chat", ["Layers", "Player", "Activity"], function (Layers, Player, Activity) {
 
 	var chatBubbleStayMsPerChar = 150;
 
@@ -42,7 +42,7 @@ define("Chat", ["Map", "Player", "Activity"], function (Map, Player, Activity) {
 	}
 
 	function processActivity(next) {
-		var result, pos, x, y;
+		var result, pos, mapId, x, y;
 
 		if (Meteor.isClient) {
 			result = generateChatBubble(this.data, 25);
@@ -50,12 +50,12 @@ define("Chat", ["Map", "Player", "Activity"], function (Map, Player, Activity) {
 			x = pos.x - 2;
 			y = pos.y - result.height;
 
-			Map.layerAdd(Map.LAYER_CHATTER, x, y, result.bubble);
+			Layers.add(Layers.CHATTER, x, y, result.bubble);
 		}
 
 		setTimeout(function () {
 			if (Meteor.isClient) {
-				Map.layerSub(Map.LAYER_CHATTER, x, y, result.bubble);
+				Layers.sub(Layers.CHATTER, x, y, result.bubble);
 			}
 			next();
 		}, chatBubbleStayMsPerChar * this.data.length);

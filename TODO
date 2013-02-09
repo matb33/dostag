@@ -11,14 +11,14 @@ TODO:
  ☐ setup the game to be in "rounds", where you can't just join a game mid-way, you have to wait until someone wins to join the match (observe mode)
  ☐ as soon as there is more than one player in a map, the round begins
  ☐ perhaps show basic controls somewhere, off the dos box
- ☐ setup the Damager module
+ ☐ setup being able to kill another player
  ☐ have the new round event perform the reset on the map, where map content is re-exported to grid format
- ☐ measure data going over-the-wire for various layers. Is the [y + "_" + x] strategy working? Should we revert back to [y][x]? Or perhaps we even flatten it further and put it right in the root of the document, like ["layername_" + y + "_" + "x"]
+ ✔ measure data going over-the-wire for various layers. Is the [y + "_" + x] strategy working? Should we revert back to [y][x]? Or perhaps we even flatten it further and put it right in the root of the document, like ["layername_" + y + "_" + "x"] @done (13-02-09 14:38)
  ☐ make the default map much bigger and more interesting
- ☐ rename "grid" layer to "map"
- ☐ consider renaming Sprites module to Sprite, to match all other modules
- ☐ convert to Activity collection instead of rendering weapons in map layer
+ ✔ consider renaming Sprites module to Sprite, to match all other modules @done (13-02-09 14:38)
+ ✔ convert to Activity collection instead of rendering weapons in map layer @done (13-02-09 14:38)
  ☐ consider abstracting Meteor.users in Player module
+ ☐ optimize networking, specifically whenever we attack, position data really lags badly
 
 LONG TERM:
  ☐ consider an instance system, possibly with a separate server-browser Meteor app that can see the various game servers? dostag.meteor.com would see dostag01.meteor.com, dostag02.meteor.com, etc

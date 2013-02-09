@@ -1,4 +1,4 @@
-define("Renderer", ["Map", "Player", "Sprite"], function (Map, Player, Sprite) {
+define("Renderer", ["Map", "Player", "Sprite", "Layers"], function (Map, Player, Sprite, Layers) {
 
 	if (Meteor.isClient) {
 		return (function () {
@@ -11,34 +11,39 @@ define("Renderer", ["Map", "Player", "Sprite"], function (Map, Player, Sprite) {
 
 			Meteor.autorun(function () {
 				var mapId, map;
-				var pos, x1, x2, y1, y2, x, y, players, key, clientLayers;
+				var pos, x1, x2, y1, y2, x, y, players, key;
 				var others = {}, output = "";
+				var overlay, weapons, chatter;
 				var player = Meteor.user();
+
+				output += "\n";
+				output += "      ____   ____  _____ ______ ___    ______  \n";
+				output += "     / __ \\ / __ \\/ ___//_  __//   |  / ____/  \n";
+				output += "    / / / // / / /\\__ \\  / /  / /| | / / __    \n";
+				output += "   / /_/ // /_/ /___/ / / /  / ___ |/ /_/ /    \n";
+				output += "  /_____/ \\____//____/ /_/  /_/  |_|\\____/     \n";
+				output += "\n\n";
 
 				if (player) {
 					mapId = Player.getJoinedMapId(player._id);
 					map = Map.getMapById(mapId);
 
-					output += "\n";
-					output += "      ____   ____  _____ ______ ___    ______  \n";
-					output += "     / __ \\ / __ \\/ ___//_  __//   |  / ____/  \n";
-					output += "    / / / // / / /\\__ \\  / /  / /| | / / __    \n";
-					output += "   / /_/ // /_/ /___/ / / /  / ___ |/ /_/ /    \n";
-					output += "  /_____/ \\____//____/ /_/  /_/  |_|\\____/     \n";
-					output += "\n\n";
-
 					if (map) {
 						pos = Player.getPosition();
 
 						if (pos) {
-							clientLayers = Map.getClientLayers();
-
+							// Get positions of other players
 							players = Meteor.users.find();
 							players.forEach(function (player) {
 								var ox = player.position && player.position.x || -1;
 								var oy = player.position && player.position.y || -1;
 								others[oy + "_" + ox] = true;
 							});
+
+							// Get layers
+							overlay = Layers.getDocument(Layers.OVERLAY);
+							weapons = Layers.getDocument(Layers.WEAPONS);
+							chatter = Layers.getDocument(Layers.CHATTER);
 
 							x1 = pos.x - vc2;
 							x2 = pos.x + vc2;
@@ -50,14 +55,14 @@ define("Renderer", ["Map", "Player", "Sprite"], function (Map, Player, Sprite) {
 							for (y = y1; y < y2; y++) {
 								for (x = x1; x < x2; x++) {
 									key = y + "_" + x;
-									if (clientLayers && clientLayers[Map.LAYER_CHATTER + key]) {
-										output += clientLayers[Map.LAYER_CHATTER + key];
+									if (chatter[key]) {
+										output += chatter[key];
 									} else {
 										if (x < 0 || x >= map.width || y < 0 || y >= map.height) {
 											output += Sprite.Map.OOB;
 										} else {
-											if (clientLayers && clientLayers[Map.LAYER_WEAPONS + key]) {
-												output += clientLayers[Map.LAYER_WEAPONS + key];
+											if (weapons[key]) {
+												output += weapons[key];
 											} else {
 												if (x == pos.x && y == pos.y) {
 													output += Sprite.Player.YOU;
@@ -65,7 +70,11 @@ define("Renderer", ["Map", "Player", "Sprite"], function (Map, Player, Sprite) {
 													if (others[key]) {
 														output += Sprite.Player.OTHER;
 													} else {
-														output += map[Map.LAYER_LEVEL + key];
+														if (overlay[key]) {
+															output += overlay[key];
+														} else {
+															output += map.level[key];
+														}
 													}
 												}
 											}

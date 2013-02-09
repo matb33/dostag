@@ -1,26 +1,27 @@
-using("Weapon", "Map", "Player", "Sprite", function (Weapon, Map, Player, Sprite) {
+using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, Sprite) {
 
 	function pickaxe(offset, next) {
 		var self = this;
 		var pos = Player.getPosition(self.userId);
+		var mapId = Player.getJoinedMapId(self.userId);
 		var x = pos.x + offset.x;
 		var y = pos.y + offset.y;
 
 		var _setTimeout = Meteor.isClient ? window.setTimeout : Meteor.setTimeout;
 
 		if (Meteor.isClient) {
-			Map.layerAdd.call(self, Map.LAYER_WEAPONS, x, y, Sprite.Weapon.PICKAXE);
+			Layers.add.call(self, Layers.WEAPONS, x, y, Sprite.Weapon.PICKAXE);
 		} else {
-			Map.layerAdd.call(self, Map.LAYER_DAMAGE, x, y, Sprite.Weapon.PICKAXE);
+			Layers.add.call(self, Layers.DAMAGE, x, y, Sprite.Weapon.PICKAXE, mapId);
 		}
 
-		Map.layerAdd.call(self, Map.LAYER_LEVEL, x, y, " ");
+		Layers.add.call(self, Layers.OVERLAY, x, y, " ", mapId);
 
 		_setTimeout(function () {
 			if (Meteor.isClient) {
-				Map.layerSub.call(self, Map.LAYER_WEAPONS, x, y, Sprite.Weapon.PICKAXE);
+				Layers.sub.call(self, Layers.WEAPONS, x, y, Sprite.Weapon.PICKAXE);
 			} else {
-				Map.layerSub.call(self, Map.LAYER_DAMAGE, x, y, Sprite.Weapon.PICKAXE);
+				Layers.sub.call(self, Layers.DAMAGE, x, y, Sprite.Weapon.PICKAXE, mapId);
 			}
 
 			next();

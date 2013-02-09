@@ -4,7 +4,18 @@ define("Collections", function (Collections) {
 
 	Collections.Maps = new Meteor.Collection("maps");
 	Collections.Activities = new Meteor.Collection("activities");
-	Collections.ClientLayers = new Meteor.Collection(null);
+
+	//====================
+	// Layers
+	//====================
+
+	// Server and client
+	Collections.LayerOverlay = new Meteor.Collection("layerOverlay");
+	Collections.LayerDamage = new Meteor.Collection("layerDamage");
+
+	// Client-only
+	Collections.LayerWeapons = new Meteor.Collection(null);
+	Collections.LayerChatter = new Meteor.Collection(null);
 
 	return Collections;
 

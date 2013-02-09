@@ -1,4 +1,4 @@
-using("Weapon", "Map", "Player", "Sprite", function (Weapon, Map, Player, Sprite) {
+using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Player, Sprite, Layers) {
 
 	// Disabled... reaaaaaally slow
 	return;
@@ -14,8 +14,10 @@ using("Weapon", "Map", "Player", "Sprite", function (Weapon, Map, Player, Sprite
 		inventorySprite: Sprite.Weapon.NAPALM,
 		sequence: function (next) {
 			var self = this;
-			var map = Map.getMapById(Player.getJoinedMapId(self.userId));
+			var mapId = Player.getJoinedMapId(self.userId);
+			var map = Map.getMapById(mapId);
 			var pos = Player.getPosition(self.userId);
+			var overlay = Layers.getDocument(Layers.OVERLAY, mapId);
 			var _setTimeout = Meteor.isClient ? window.setTimeout : Meteor.setTimeout;
 			var _setInterval = Meteor.isClient ? window.setInterval : Meteor.setInterval;
 			var _clearInterval = Meteor.isClient ? window.clearInterval : Meteor.clearInterval;
@@ -36,6 +38,8 @@ using("Weapon", "Map", "Player", "Sprite", function (Weapon, Map, Player, Sprite
 				reset();
 
 				intervalId = _setInterval(function () {
+					var key, targetChar;
+
 					for (var d = 0; d < 4; d++) {
 						if (!hold[d]) {
 							switch (d) {
@@ -44,13 +48,17 @@ using("Weapon", "Map", "Player", "Sprite", function (Weapon, Map, Player, Sprite
 								case 2: x[d] -= 1; break;
 								case 3: x[d] += 1; break;
 							}
-							if (Map.isTraversable(map[Map.LAYER_LEVEL + y[d] + "_" + x[d]])) {
+
+							key = y[d] + "_" + x[d];
+							targetChar = overlay[key] !== null ? overlay[key] : map.level[key];
+
+							if (Map.isTraversable(targetChar)) {
 								if (step[d] === 1) {
-									if (Meteor.isClient) { Map.layerAdd.call(self, Map.LAYER_WEAPONS, x[d], y[d], Sprite.Weapon.FIRE); }
-									else { Map.layerAdd.call(self, Map.LAYER_DAMAGE, x[d], y[d], Sprite.Weapon.FIRE); }
+									if (Meteor.isClient) { Layers.add.call(self, Layers.WEAPONS, x[d], y[d], Sprite.Weapon.FIRE); }
+									else { Layers.add.call(self, Layers.DAMAGE, x[d], y[d], Sprite.Weapon.FIRE, mapId); }
 								} else {
-									if (Meteor.isClient) { Map.layerSub.call(self, Map.LAYER_WEAPONS, x[d], y[d], Sprite.Weapon.FIRE); }
-									else { Map.layerSub.call(self, Map.LAYER_DAMAGE, x[d], y[d], Sprite.Weapon.FIRE); }
+									if (Meteor.isClient) { Layers.sub.call(self, Layers.WEAPONS, x[d], y[d], Sprite.Weapon.FIRE); }
+									else { Layers.sub.call(self, Layers.DAMAGE, x[d], y[d], Sprite.Weapon.FIRE, mapId); }
 								}
 							} else {
 								hold[d] = true;
