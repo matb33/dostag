@@ -1,6 +1,6 @@
 using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Player, Sprite, Layers) {
 
-	// Disabled... reaaaaaally slow
+	// Disabled... too slow
 	return;
 
 	function isTrue(value) {

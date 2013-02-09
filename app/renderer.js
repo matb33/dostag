@@ -37,7 +37,7 @@ define("Renderer", ["Map", "Player", "Sprite", "Layers"], function (Map, Player,
 							players.forEach(function (player) {
 								var ox = player.position && player.position.x || -1;
 								var oy = player.position && player.position.y || -1;
-								others[oy + "_" + ox] = true;
+								others[oy + "_" + ox] = player;
 							});
 
 							// Get layers
@@ -65,10 +65,10 @@ define("Renderer", ["Map", "Player", "Sprite", "Layers"], function (Map, Player,
 												output += weapons[key];
 											} else {
 												if (x == pos.x && y == pos.y) {
-													output += Sprite.Player.YOU;
+													output += player.dead ? Sprite.Player.DEAD : Sprite.Player.YOU;
 												} else {
 													if (others[key]) {
-														output += Sprite.Player.OTHER;
+														output += others[key].dead ? Sprite.Player.DEAD : Sprite.Player.OTHER;
 													} else {
 														if (overlay[key]) {
 															output += overlay[key];

@@ -11,11 +11,12 @@ define("Sprite", function () {
 
 	Sprite.Player.YOU = "☻";
 	Sprite.Player.OTHER = "☺";
+	Sprite.Player.DEAD = "☠";
 
 	Sprite.Weapon.EXPLOSION = "░";
 	Sprite.Weapon.FIRE = "▒";
-	Sprite.Weapon.BOMB = "δ";
-	Sprite.Weapon.NAPALM = "ñ";
+	Sprite.Weapon.BOMB = "☌";
+	Sprite.Weapon.NAPALM = "☢";
 	Sprite.Weapon.PICKAXE = "τ";
 
 	return Sprite;

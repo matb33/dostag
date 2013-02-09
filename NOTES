@@ -1,5 +1,1 @@
-Consider stopping modifying the Map collection during play. Instead, what about maintaining a separate collection for damage, and a separate collection for map destruction (breaking walls)?
-
-Also, should probably break out the clientLayers into separate client-side collections, one for each layer.
-
 Would it be more efficient to modify the pub-sub arrangement for layers to only send down what is within the current player's viewport? I foresee the problem with this as being whenever you move, the subscription would have to be reset each time. What happens then? Does the entire data within viewport get re-sent, even though we used to know most of it before moving?

@@ -64,6 +64,7 @@ define("Map", ["Collections", "Player", "Weapon", "LayerOps", "Layers"], functio
 				Meteor.users.update({_id: this.userId}, {$set: {
 					mapId: mapId,
 					idle: false,
+					dead: false,
 					last_keepalive: Date.now(),
 					inventory: Weapon.getInitialInventory()
 				}});

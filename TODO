@@ -1,6 +1,5 @@
 TODO:
  ☐ implement an intro screen that shows instructions, possibly allowing you to change your username
- ✔ allow chat bubbles @done (13-02-07 22:13)
  ☐ implement a stat bar in a corner that shows:
    ☐ remaining bombs
    ☐ # of players
@@ -13,12 +12,15 @@ TODO:
  ☐ perhaps show basic controls somewhere, off the dos box
  ☐ setup being able to kill another player
  ☐ have the new round event perform the reset on the map, where map content is re-exported to grid format
- ✔ measure data going over-the-wire for various layers. Is the [y + "_" + x] strategy working? Should we revert back to [y][x]? Or perhaps we even flatten it further and put it right in the root of the document, like ["layername_" + y + "_" + "x"] @done (13-02-09 14:38)
  ☐ make the default map much bigger and more interesting
+ ☐ consider abstracting Meteor.users in Player module
+ ☐ not a huge deal, but it would be nice if the chat bubbles following the player as he moved
+ ✔ allow chat bubbles @done (13-02-07 22:13)
+ ✔ optimize networking, specifically whenever we attack, position data really lags badly @done (13-02-09 17:26)
+ ✔ measure data going over-the-wire for various layers. Is the [y + "_" + x] strategy working? Should we revert back to [y][x]? Or perhaps we even flatten it further and put it right in the root of the document, like ["layername_" + y + "_" + "x"] @done (13-02-09 14:38)
  ✔ consider renaming Sprites module to Sprite, to match all other modules @done (13-02-09 14:38)
  ✔ convert to Activity collection instead of rendering weapons in map layer @done (13-02-09 14:38)
- ☐ consider abstracting Meteor.users in Player module
- ☐ optimize networking, specifically whenever we attack, position data really lags badly
+
 
 LONG TERM:
  ☐ consider an instance system, possibly with a separate server-browser Meteor app that can see the various game servers? dostag.meteor.com would see dostag01.meteor.com, dostag02.meteor.com, etc
