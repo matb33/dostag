@@ -10,66 +10,70 @@ define("Renderer", ["Map", "Player", "Sprite"], function (Map, Player, Sprite) {
 			var vr2 = Math.floor(viewportRows / 2)
 
 			Meteor.autorun(function () {
-				var player = Meteor.user();
-				var mapId = Player.getJoinedMapId(player._id);
-				var map = Map.getMapById(mapId);
+				var mapId, map;
 				var pos, x1, x2, y1, y2, x, y, players, key, clientLayers;
 				var others = {}, output = "";
+				var player = Meteor.user();
 
-				output += "\n";
-				output += "      ____   ____  _____ ______ ___    ______  \n";
-				output += "     / __ \\ / __ \\/ ___//_  __//   |  / ____/  \n";
-				output += "    / / / // / / /\\__ \\  / /  / /| | / / __    \n";
-				output += "   / /_/ // /_/ /___/ / / /  / ___ |/ /_/ /    \n";
-				output += "  /_____/ \\____//____/ /_/  /_/  |_|\\____/     \n";
-				output += "\n\n";
+				if (player) {
+					mapId = Player.getJoinedMapId(player._id);
+					map = Map.getMapById(mapId);
 
-				if (map) {
-					pos = Player.getPosition();
+					output += "\n";
+					output += "      ____   ____  _____ ______ ___    ______  \n";
+					output += "     / __ \\ / __ \\/ ___//_  __//   |  / ____/  \n";
+					output += "    / / / // / / /\\__ \\  / /  / /| | / / __    \n";
+					output += "   / /_/ // /_/ /___/ / / /  / ___ |/ /_/ /    \n";
+					output += "  /_____/ \\____//____/ /_/  /_/  |_|\\____/     \n";
+					output += "\n\n";
 
-					if (pos) {
-						clientLayers = Map.getClientLayers();
+					if (map) {
+						pos = Player.getPosition();
 
-						players = Meteor.users.find();
-						players.forEach(function (player) {
-							var ox = player.position && player.position.x || -1;
-							var oy = player.position && player.position.y || -1;
-							others[oy + "_" + ox] = true;
-						});
+						if (pos) {
+							clientLayers = Map.getClientLayers();
 
-						x1 = pos.x - vc2;
-						x2 = pos.x + vc2;
-						y1 = pos.y - vr2;
-						y2 = pos.y + vr2;
+							players = Meteor.users.find();
+							players.forEach(function (player) {
+								var ox = player.position && player.position.x || -1;
+								var oy = player.position && player.position.y || -1;
+								others[oy + "_" + ox] = true;
+							});
 
-						output = "";
+							x1 = pos.x - vc2;
+							x2 = pos.x + vc2;
+							y1 = pos.y - vr2;
+							y2 = pos.y + vr2;
 
-						for (y = y1; y < y2; y++) {
-							for (x = x1; x < x2; x++) {
-								key = y + "_" + x;
-								if (clientLayers && clientLayers[Map.LAYER_CHATTER + key]) {
-									output += clientLayers[Map.LAYER_CHATTER + key];
-								} else {
-									if (x < 0 || x >= map.width || y < 0 || y >= map.height) {
-										output += Sprite.Map.OOB;
+							output = "";
+
+							for (y = y1; y < y2; y++) {
+								for (x = x1; x < x2; x++) {
+									key = y + "_" + x;
+									if (clientLayers && clientLayers[Map.LAYER_CHATTER + key]) {
+										output += clientLayers[Map.LAYER_CHATTER + key];
 									} else {
-										if (clientLayers && clientLayers[Map.LAYER_WEAPONS + key]) {
-											output += clientLayers[Map.LAYER_WEAPONS + key];
+										if (x < 0 || x >= map.width || y < 0 || y >= map.height) {
+											output += Sprite.Map.OOB;
 										} else {
-											if (x == pos.x && y == pos.y) {
-												output += Sprite.Player.YOU;
+											if (clientLayers && clientLayers[Map.LAYER_WEAPONS + key]) {
+												output += clientLayers[Map.LAYER_WEAPONS + key];
 											} else {
-												if (others[key]) {
-													output += Sprite.Player.OTHER;
+												if (x == pos.x && y == pos.y) {
+													output += Sprite.Player.YOU;
 												} else {
-													output += map[Map.LAYER_LEVEL + key];
+													if (others[key]) {
+														output += Sprite.Player.OTHER;
+													} else {
+														output += map[Map.LAYER_LEVEL + key];
+													}
 												}
 											}
 										}
 									}
 								}
+								output += "\n";
 							}
-							output += "\n";
 						}
 					}
 				}

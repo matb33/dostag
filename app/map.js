@@ -16,6 +16,7 @@ define("Map", ["Collections", "Player", "LayerOps", "Weapon"], function (Collect
 	LAYER_LOCATIONS[LAYER_CHATTER] = CLIENT_LAYER;
 
 	function getMaps() {
+		// TODO: find a way to exclude LAYER_DAMAGE properties from being published
 		return Collections.Maps.find();
 	}
 

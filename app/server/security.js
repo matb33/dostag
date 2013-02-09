@@ -6,7 +6,9 @@ using("Collections", function (Collections) {
 			return false;
 		},
 		update: function (userId, docs, fields) {
- 			return false;
+			// TEMPORARY! just allow client to modify so we don't get
+			// access denied despite it working on the server
+ 			return true;
 		},
 		remove: function () {
 			return false;
