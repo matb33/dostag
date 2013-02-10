@@ -52,36 +52,32 @@ define("Weapon", ["Activity"], function (Activity) {
 			defs[id].sequence.call(self, next);
 
 			// Decrease inventory
-			if (Meteor.isServer) {
-				if (defs[id].resupply > 0) {
-					inc["inventory." + id] = -1;
-					Meteor.users.update({_id: self.userId}, {$inc: inc});
-				}
+			if (defs[id].resupply > 0) {
+				inc["inventory." + id] = -1;
+				Meteor.users.update({_id: self.userId}, {$inc: inc});
 			}
 		}
 	}
 
-	if (Meteor.isServer) {
-		Meteor.startup(function () {
+	Meteor.startup(function () {
 
-			// Control inventory resupply
-			_.each(defs, function (def, id) {
-				if (def.resupply > 0) {
-					Meteor.setInterval(function () {
-						var players = Meteor.users.find({idle: false});
-						players.forEach(function (player) {
-							var inc = {};
-							if (player.inventory[id] < def.max) {
-								inc["inventory." + id] = 1;
-								Meteor.users.update({_id: player._id}, {$inc: inc});
-							}
-						});
-					}, def.resupply);
-				}
-			});
-
+		// Control inventory resupply
+		_.each(defs, function (def, id) {
+			if (def.resupply > 0) {
+				Meteor.setInterval(function () {
+					var players = Meteor.users.find({idle: false});
+					players.forEach(function (player) {
+						var inc = {};
+						if (player.inventory[id] < def.max) {
+							inc["inventory." + id] = 1;
+							Meteor.users.update({_id: player._id}, {$inc: inc});
+						}
+					});
+				}, def.resupply);
+			}
 		});
-	}
+
+	});
 
 	return {
 		define: define,

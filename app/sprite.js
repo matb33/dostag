@@ -8,6 +8,11 @@ define("Sprite", function () {
 
 	Sprite.Map.OOB = "·";
 	Sprite.Map.TRANSPARENT = "`";
+	Sprite.Map.METAL_FULL = "█";
+	Sprite.Map.METAL_BOTTOM = "▄";
+	Sprite.Map.METAL_TOP = "▀";
+	Sprite.Map.METAL_LEFT = "▌";
+	Sprite.Map.METAL_RIGHT = "▐";
 
 	Sprite.Player.YOU = "☻";
 	Sprite.Player.OTHER = "☺";

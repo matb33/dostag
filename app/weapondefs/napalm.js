@@ -53,7 +53,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 							key = y[d] + "_" + x[d];
 							targetChar = overlay[key] !== null ? overlay[key] : map.level[key];
 
-							if (Map.isTraversable(targetChar)) {
+							if (Map.traversable(targetChar)) {
 								if (step[d] === 1) {
 									if (Meteor.isClient) { Layers.add.call(self, Layers.WEAPONS, x[d], y[d], Sprite.Weapon.FIRE); }
 									else { Layers.add.call(self, Layers.DAMAGE, x[d], y[d], Sprite.Weapon.FIRE, mapId); }

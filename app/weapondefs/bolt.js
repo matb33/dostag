@@ -24,10 +24,10 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 
 			var destroyInitial = 1;
 
-			function isTraversable(x, y) {
+			function traversable(x, y) {
 				var key = y + "_" + x;
 				var targetChar = overlay[key] !== null ? overlay[key] : map.level[key];
-				return Map.isTraversable(targetChar);
+				return Map.traversable(targetChar);
 			}
 
 			function addWeaponPath(x, y) {
@@ -75,7 +75,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 						} else {
 							// Subsequent chars are stopped by walls and thus don't
 							// add to the overlay
-							if (isTraversable(x[d], y[d])) {
+							if (traversable(x[d], y[d])) {
 								addWeaponPath(x[d], y[d]);
 							} else {
 								hold[d] = true;

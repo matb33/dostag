@@ -1,16 +1,16 @@
 TODO:
  ☐ implement an intro screen that shows instructions, possibly allowing you to change your username
  ☐ implement a stat bar in a corner that shows:
-   ☐ remaining bombs
-   ☐ # of players
+   ✔ remaining bombs @done (13-02-10 16:48)
+   ✔ # of players @done (13-02-10 16:48)
    ☐ ping?
- ☐ have bombs limited and resupply at a given rate
+ ✔ have bombs limited and resupply at a given rate @done (13-02-10 16:48)
  ☐ allow user to load a new map via URL
  ☐ allow user to see other actively loaded maps on same server, and switch
  ☐ setup the game to be in "rounds", where you can't just join a game mid-way, you have to wait until someone wins to join the match (observe mode)
  ☐ as soon as there is more than one player in a map, the round begins
- ☐ perhaps show basic controls somewhere, off the dos box
- ☐ setup being able to kill another player
+ ✔ perhaps show basic controls somewhere, off the dos box @done (13-02-10 16:48)
+ ✔ setup being able to kill another player @done (13-02-10 16:48)
  ☐ have the new round event perform the reset on the map, where map content is re-exported to grid format
  ☐ make the default map much bigger and more interesting
  ☐ consider abstracting Meteor.users in Player module

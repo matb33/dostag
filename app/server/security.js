@@ -18,10 +18,10 @@ using("Collections", function (Collections) {
 	});
 
 	// Users aren't allowed to modify their own positions directly
+	// They are also not allowed to modify their inventory
 	Meteor.users.deny({
 		update: function (userId, docs, fields) {
-			// TODO: is this even working? double-check that this is getting called
-			return _.contains(fields, "position");
+			return _.contains(fields, "position");// || _.contains(fields, "inventory");
 		}
 	});
 

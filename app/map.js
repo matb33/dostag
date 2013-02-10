@@ -1,4 +1,4 @@
-define("Map", ["Collections", "Player", "Weapon", "LayerOps", "Layers"], function (Collections, Player, Weapon, LayerOps, Layers) {
+define("Map", ["Collections", "Player", "Weapon", "LayerOps", "Layers", "Sprite"], function (Collections, Player, Weapon, LayerOps, Layers, Sprite) {
 
 	function getMaps() {
 		return Collections.Maps.find();
@@ -8,8 +8,20 @@ define("Map", ["Collections", "Player", "Weapon", "LayerOps", "Layers"], functio
 		return Collections.Maps.findOne({_id: mapId});
 	}
 
-	function isTraversable(c) {
+	function traversable(c) {
 		return c === null || c === undefined || c.trim() === "";
+	}
+
+	function destructible(c) {
+		var indestructible = [
+			Sprite.Map.METAL_FULL,
+			Sprite.Map.METAL_BOTTOM,
+			Sprite.Map.METAL_TOP,
+			Sprite.Map.METAL_LEFT,
+			Sprite.Map.METAL_RIGHT
+		];
+
+		return indestructible.indexOf(c) === -1;
 	}
 
 	function collides(map, pos) {
@@ -28,10 +40,13 @@ define("Map", ["Collections", "Player", "Weapon", "LayerOps", "Layers"], functio
 			overlay = Layers.getDocument(Layers.OVERLAY, map._id);
 
 			if (map.level && map.level[key]) {
+				// If the map char is indestructible, always collide
+				if (!destructible(map.level[key])) return true;
+
 				// If an overlay exists in the overlay layer,
 				// it should take precedence
 				targetChar = overlay[key] !== null ? overlay[key] : map.level[key];
-				if (!isTraversable(targetChar)) {
+				if (!traversable(targetChar)) {
 					return true;
 				}
 			}
@@ -136,7 +151,8 @@ define("Map", ["Collections", "Player", "Weapon", "LayerOps", "Layers"], functio
 	return {
 		getMaps: getMaps,
 		getMapById: getMapById,
-		isTraversable: isTraversable,
+		traversable: traversable,
+		destructible: destructible,
 		collides: collides,
 		getRandomNonCollidePosition: getRandomNonCollidePosition
 	};
