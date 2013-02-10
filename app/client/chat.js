@@ -41,6 +41,11 @@ define("Chat", ["Layers", "Player", "Activity"], function (Layers, Player, Activ
 		}
 	}
 
+	function verifyActivity() {
+		// Can always chat, dead or not
+		return true;
+	}
+
 	function processActivity(next) {
 		var result, pos, mapId, x, y;
 
@@ -63,6 +68,7 @@ define("Chat", ["Layers", "Player", "Activity"], function (Layers, Player, Activ
 
 	return {
 		prompt: prompt,
+		verifyActivity: verifyActivity,
 		processActivity: processActivity
 	};
 

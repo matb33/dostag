@@ -13,7 +13,13 @@ define("Weapon", ["Activity"], function (Activity) {
 	}
 
 	function getInitialInventory() {
-		return {};	// TODO, write this based on weapon def
+		var inv = {};
+
+		_.each(defs, function (def) {
+			inv[def.id] = def.initial;
+		});
+
+		return inv;
 	}
 
 	function trigger(id) {
@@ -27,10 +33,53 @@ define("Weapon", ["Activity"], function (Activity) {
 		}
 	}
 
+	function verifyActivity(activity, player) {
+		var id = activity.data;
+		if (player.dead) return false;
+		if (defs[id].initial === -1) return true;
+		if (player.inventory[id] > 0) return true;
+		return false;
+	}
+
 	function processActivity(next) {
-		if (typeof defs[this.data].sequence === "function") {
-			defs[this.data].sequence.call(this, next);
+		var self = this;
+		var player = Meteor.users.findOne({_id: self.userId});
+		var inc = {};
+		var id = self.data;
+
+		if (typeof defs[id].sequence === "function") {
+			defs[id].sequence.call(self, next);
+
+			// Decrease inventory
+			if (Meteor.isServer) {
+				if (defs[id].resupply > 0) {
+					inc["inventory." + id] = -1;
+					Meteor.users.update({_id: self.userId}, {$inc: inc});
+				}
+			}
 		}
+	}
+
+	if (Meteor.isServer) {
+		Meteor.startup(function () {
+
+			// Control inventory resupply
+			_.each(defs, function (def, id) {
+				if (def.resupply > 0) {
+					Meteor.setInterval(function () {
+						var players = Meteor.users.find({idle: false});
+						players.forEach(function (player) {
+							var inc = {};
+							if (player.inventory[id] < def.initial) {
+								inc["inventory." + id] = 1;
+								Meteor.users.update({_id: player._id}, {$inc: inc});
+							}
+						});
+					}, def.resupply);
+				}
+			});
+
+		});
 	}
 
 	return {
@@ -38,6 +87,7 @@ define("Weapon", ["Activity"], function (Activity) {
 		trigger: trigger,
 		defs: defs,
 		getInitialInventory: getInitialInventory,
+		verifyActivity: verifyActivity,
 		processActivity: processActivity
 	};
 

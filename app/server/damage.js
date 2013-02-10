@@ -1,5 +1,7 @@
 define("Damage", ["Collections"], function (Collections) {
 
+	var stayDeadForMs = 15000;
+
 	// Detect damage to players caused by the damage layer
 	var damageLayer = Collections.LayerDamage.find();
 	var handle = damageLayer.observe({
@@ -9,6 +11,9 @@ define("Damage", ["Collections"], function (Collections) {
 				if (player.position) {
 					if (doc[player.position.y + "_" + player.position.x] !== null) {
 						Meteor.users.update({_id: player._id}, {$set: {dead: true}});
+						Meteor.setTimeout(function () {
+							Meteor.users.update({_id: player._id}, {$set: {dead: false}});
+						}, stayDeadForMs);
 					}
 				}
 			});

@@ -103,6 +103,7 @@ define("Player", function () {
 	}
 
 	return {
+		getPlayer: getPlayer,
 		getPosition: getPosition,
 		getJoinedMapId: getJoinedMapId
 	};

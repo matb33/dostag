@@ -4,6 +4,8 @@
 
 // Modules that implement an Activity.push must expose a processActivity
 // function, and are responsible for calling the passed callback for cleanup.
+// Optionally, they can also expose a verifyActivity, which must return a
+// boolean that indicates whether or not to proceed with this activity.
 
 // Note that activities work on both client and server. You can simulate, etc
 
@@ -26,18 +28,28 @@ define("Activity", ["Collections"], function (Collections) {
 			if (typeof activity.module === "undefined") throw new Error("Must specify 'module' when pushing activity");
 			if (typeof activity.data === "undefined") throw new Error("Must specify 'data' when pushing activity");
 
-			var player = Meteor.users.findOne({_id: this.userId});
+			var self = this;
+			var activity, verified = true;
+			var player = Meteor.users.findOne({_id: self.userId});
 
-			var activity = _.extend({
-				userId: this.userId,
+			using(activity.module, function (module) {
+				if (typeof module.verifyActivity === "function") {
+					verified = module.verifyActivity.call(self, activity, player);
+				}
+			});
+
+			if (!verified) return;
+
+			activity = _.extend({
+				userId: self.userId,
 				mapId: player.mapId
 			}, activity);
 
 			// Process this activity immediately for this user,
 			// for both client *and* server
-			process(activity);
+			process.call(self, activity);
 
-			if (!this.isSimulation) {
+			if (!self.isSimulation) {
 				// Have the server send the activity to other users
 				Collections.Activities.insert(activity);
 			}

@@ -2,8 +2,11 @@ using("Player", "Map", function (Player, Map) {
 
 	Meteor.methods({
 		moveDirection: function (direction) {
+			var player = Player.getPlayer(this.userId);
 			var pos = Player.getPosition(this.userId);
 			var mapId = Player.getJoinedMapId(this.userId);
+
+			if (player.dead) return;
 
 			if (pos && mapId) {
 				switch (direction) {
