@@ -10,7 +10,7 @@ define("Stats", ["Weapon"], function (Weapon) {
 
 		_.each(Weapon.defs, function (def, id) {
 			var count = player.inventory && player.inventory[id] || 0;
-			if (count !== -1) {
+			if (count !== -1 && def.initial !== -1) {
 				inventory.push({
 					id: id,
 					count: count,
