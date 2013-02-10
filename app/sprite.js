@@ -18,6 +18,7 @@ define("Sprite", function () {
 	Sprite.Weapon.BOMB = "☌";
 	Sprite.Weapon.NAPALM = "☢";
 	Sprite.Weapon.PICKAXE = "τ";
+	Sprite.Weapon.BOLT = "⚡";
 
 	return Sprite;
 

@@ -31,6 +31,7 @@ using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, 
 	var options = {
 		initial: -1,
 		resupply: 0,
+		max: -1,
 		inventorySprite: Sprite.Weapon.PICKAXE
 	};
 

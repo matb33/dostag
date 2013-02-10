@@ -10,6 +10,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 	Weapon.define({
 		id: "napalm",
 		initial: 3,
+		max: 3,
 		resupply: 10000,
 		inventorySprite: Sprite.Weapon.NAPALM,
 		sequence: function (next) {

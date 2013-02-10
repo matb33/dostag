@@ -5,6 +5,7 @@ define("Weapon", ["Activity"], function (Activity) {
 	function define(def) {
 		if (typeof def.id === "undefined") throw new Error("Weapon definition missing 'id'");
 		if (typeof def.initial === "undefined") throw new Error("Weapon definition missing 'initial'");
+		if (typeof def.max === "undefined") throw new Error("Weapon definition missing 'max'");
 		if (typeof def.resupply === "undefined") throw new Error("Weapon definition missing 'resupply'");
 		if (typeof def.inventorySprite === "undefined") throw new Error("Weapon definition missing 'inventorySprite'");
 		if (defs[def.id]) throw new Error("Weapon '" + def.id + "' already defined");
@@ -70,7 +71,7 @@ define("Weapon", ["Activity"], function (Activity) {
 						var players = Meteor.users.find({idle: false});
 						players.forEach(function (player) {
 							var inc = {};
-							if (player.inventory[id] < def.initial) {
+							if (player.inventory[id] < def.max) {
 								inc["inventory." + id] = 1;
 								Meteor.users.update({_id: player._id}, {$inc: inc});
 							}

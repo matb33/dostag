@@ -46,6 +46,7 @@ using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, 
 	Weapon.define({
 		id: "bomb",
 		initial: 5,
+		max: 5,
 		resupply: 5000,
 		inventorySprite: Sprite.Weapon.BOMB,
 		sequence: function (next) {

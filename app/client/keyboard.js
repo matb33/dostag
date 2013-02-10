@@ -5,6 +5,8 @@ using("Chat", "Weapon", function (Chat, Weapon) {
 			var direction;
 			var weapon;
 
+			//console.log(evt.keyCode);
+
 			switch (evt.keyCode) {
 				case 37: direction = 1; break;			// right
 				case 38: direction = 2; break;			// up
@@ -13,6 +15,7 @@ using("Chat", "Weapon", function (Chat, Weapon) {
 
 				case 66: weapon = "bomb"; break;		// b
 				//case 78: weapon = "napalm"; break;		// n (currently disabled, too slow)
+				case 88: weapon = "bolt"; break;		// x
 
 				case 87: weapon = "pickaxe_u"; break;	// w
 				case 83: weapon = "pickaxe_d"; break;	// s
