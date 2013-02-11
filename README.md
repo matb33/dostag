@@ -28,7 +28,7 @@ On that topic, there is huge room for improvement. Feel free to fork this projec
 
 -	Speed/network optimizations are needed. I have gone through several techniques already, but my game coding experience is rather limited. I'm probably re-inventing the wheel (badly) on several fronts... Perhaps game developers who are dabbling in Meteor could use this code as a starting point and put their expertise into making it a more fluid experience. I'm sure some of it has to do with Meteor itself, considering it's not intended for this type of use case!
 
--	The "viewport" template could literally be renamed "canvas". I'm literally rendering to text instead of graphics. It would be a no-brainer to replace it with a canvas and go old-school Zelda on this thing.
+-	The "viewport" template could literally be renamed "canvas". I'm simply rendering to text instead of graphics. It would be a no-brainer to replace it with a canvas and go old-school Zelda on this thing.
 
 -	I never got around to figuring out a good approach to locking down certain collections. I think with some more time, I would eventually figure out the right approach. If you dive in to the code, you'll notice how I open up certain collections for client modification. This needs to be fixed to avoid cheating.
 
