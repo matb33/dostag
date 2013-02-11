@@ -1,14 +1,7 @@
 TODO:
- ☐ implement a stat bar in a corner that shows:
-   ✔ remaining bombs @done (13-02-10 16:48)
-   ✔ # of players @done (13-02-10 16:48)
-   ☐ ping?
  ☐ allow user to load a new map via URL
  ☐ allow user to see other actively loaded maps on same server, and switch
  ☐ make the default map much bigger and more interesting
- ☐ consider abstracting Meteor.users in Player module
- ☐ not a huge deal, but it would be nice if the chat bubbles followed the player as he moved
- ☐ consider moving the Movement stuff to an Activity
  ✔ allow chat bubbles @done (13-02-07 22:13)
  ✔ optimize networking, specifically whenever we attack, position data really lags badly @done (13-02-09 17:26)
  ✔ measure data going over-the-wire for various layers. Is the [y + "_" + x] strategy working? Should we revert back to [y][x]? Or perhaps we even flatten it further and put it right in the root of the document, like ["layername_" + y + "_" + "x"] @done (13-02-09 14:38)
@@ -17,11 +10,14 @@ TODO:
  ✔ perhaps show basic controls somewhere, off the dos box @done (13-02-10 16:48)
  ✔ setup being able to kill another player @done (13-02-10 16:48)
  ✔ have bombs limited and resupply at a given rate @done (13-02-10 16:48)
+ ✔ implement a stat bar in a corner that shows: @done (13-02-11 14:28)
+   ✔ remaining bombs @done (13-02-10 16:48)
+   ✔ # of players @done (13-02-10 16:48)
 
 MAYBE:
  ☐ setup the game to be in "rounds", where you can't just join a game mid-way, you have to wait until someone wins to join the match (observe mode)
  ☐ as soon as there is more than one player in a map, the round begins
  ☐ implement an intro screen that shows instructions, possibly allowing you to change your username
-
-LONG TERM:
- ☐ consider an instance system, possibly with a separate server-browser Meteor app that can see the various game servers? dostag.meteor.com would see dostag01.meteor.com, dostag02.meteor.com, etc
+ ☐ consider abstracting Meteor.users in Player module
+ ☐ not a huge deal, but it would be nice if the chat bubbles followed the player as he moved
+ ☐ consider moving the Movement stuff to an Activity
