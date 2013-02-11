@@ -20,7 +20,7 @@ define("Renderer", ["Map", "Player", "Sprite", "Layers"], function (Map, Player,
 		output += "   / /_/ // /_/ /___/ / / /  / ___ |/ /_/ /    \n";
 		output += "  /_____/ \\____//____/ /_/  /_/  |_|\\____/     \n";
 		output += "\n\n";
-		output += "            L O A D I N G\n";
+		output += "              L O A D I N G\n";
 		output += "\n\n";
 
 		if (player) {

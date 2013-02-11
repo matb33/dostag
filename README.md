@@ -20,9 +20,11 @@ It's a take on AMD (asychronous module definition), but adapted for Meteor. This
 
 ## Are you going to polish this game?
 
-Not actively. It's only meant as proof of concept, and besides... it's really awful to look at (intentionally). I will probably make minor improvements, but no guarantees. I have other things to do.
+Not actively. It's only meant as a proof of concept — and besides... it's really awful to look at (intentionally). I will probably make minor improvements, but no guarantees. I have other things to do.
 
 On that topic, there is huge room for improvement. Feel free to fork this project, change it, learn from it, build on it, whatever. Here are some thoughts:
+
+-	Speed/network optimizations are needed. I have gone through several techniques already, but my game coding experience is rather limited. I'm probably re-inventing the wheel (badly) on several fronts... Perhaps game developers who are dabbling in Meteor could use this code as a starting point and put their expertise into making it a more fluid experience. I'm sure some of it has to do with Meteor itself, considering it's not intended for this type of use case!
 
 -	The "viewport" template could literally be renamed "canvas". I'm literally rendering to text instead of graphics. It would be a no-brainer to replace it with a canvas and go old-school Zelda on this thing.
 
