@@ -7,14 +7,6 @@ using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, 
 	};
 
 	var f2 = {
-		x: -1,
-		y: -1,
-		m: 	"`#`\n" +
-			"###\n" +
-			"`#`"
-	};
-
-	var f3 = {
 		x: -2,
 		y: -2,
 		m: 	"``#``\n" +
@@ -24,24 +16,25 @@ using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, 
 			"``#``"
 	};
 
-	var f4 = {
-		x: -3,
-		y: -3,
-		m: 	"```#```\n" +
-			"``###``\n" +
-			"`#####`\n" +
-			"#######\n" +
-			"`#####`\n" +
-			"``###``\n" +
-			"```#```"
+	var f3 = {
+		x: -4,
+		y: -4,
+		m: 	"````#````\n" +
+			"```###```\n" +
+			"``#####``\n" +
+			"`#######`\n" +
+			"#########\n" +
+			"`#######`\n" +
+			"``#####``\n" +
+			"```###```\n" +
+			"````#````"
 	};
 
-	var hole = f4.m.replace(new RegExp("#", "g"), " ");
+	var hole = f3.m.replace(new RegExp("#", "g"), " ");
 
 	f1.explosion = f1.m.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
 	f2.explosion = f2.m.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
 	f3.explosion = f3.m.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
-	f4.explosion = f4.m.replace(new RegExp("#", "g"), Sprite.Weapon.EXPLOSION);
 
 	Weapon.define({
 		id: "bomb",
@@ -59,13 +52,13 @@ using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, 
 			_setTimeout(function () {
 				if (Meteor.isServer) {
 					// Reduce chatter by setting damage right away, and not incrementally for each frame
-					Layers.add.call(self, Layers.OVERLAY, x + f4.x, y + f4.y, hole, mapId);
-					Layers.add.call(self, Layers.DAMAGE, x + f4.x, y + f4.y, f4.explosion, mapId);
+					Layers.add.call(self, Layers.OVERLAY, x + f3.x, y + f3.y, hole, mapId);
+					Layers.add.call(self, Layers.DAMAGE, x + f3.x, y + f3.y, f3.explosion, mapId);
 
 					// Control removal of damage layer separately. Make it "instant", but wrap it in
 					// a setTimeout so that it has time to take effect
 					_setTimeout(function () {
-						Layers.sub.call(self, Layers.DAMAGE, x + f4.x, y + f4.y, f4.explosion, mapId);
+						Layers.sub.call(self, Layers.DAMAGE, x + f3.x, y + f3.y, f3.explosion, mapId);
 					}, 0);
 				}
 
@@ -85,18 +78,12 @@ using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, 
 
 						_setTimeout(function () {
 							if (Meteor.isClient) {
-								Layers.add.call(self, Layers.WEAPONS, x + f4.x, y + f4.y, f4.explosion);
+								Layers.sub.call(self, Layers.WEAPONS, x + f3.x, y + f3.y, f3.explosion);
+								Layers.add.call(self, Layers.OVERLAY, x + f3.x, y + f3.y, hole);
 							}
 
-							_setTimeout(function () {
-								if (Meteor.isClient) {
-									Layers.sub.call(self, Layers.WEAPONS, x + f4.x, y + f4.y, f4.explosion);
-									Layers.add.call(self, Layers.OVERLAY, x + f4.x, y + f4.y, hole);
-								}
-
-								next();
-							}, 500);
-						}, 40);
+							next();
+						}, 500);
 					}, 40);
 				}, 40);
 			}, 2000);

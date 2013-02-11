@@ -91,7 +91,11 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 				if (Meteor.isClient) {
 					Layers.add.call(self, Layers.WEAPONS, wx, wy, weaponPath);
 				} else {
+					// Add to damage layer, but remove right away on next tick
 					Layers.add.call(self, Layers.DAMAGE, wx, wy, weaponPath, mapId);
+					_setTimeout(function () {
+						Layers.sub.call(self, Layers.DAMAGE, wx, wy, weaponSubPath, mapId);
+					}, 0);
 				}
 
 				Layers.add.call(self, Layers.OVERLAY, ox, oy, overlayPath, mapId);
@@ -99,8 +103,6 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 				_setTimeout(function () {
 					if (Meteor.isClient) {
 						Layers.sub.call(self, Layers.WEAPONS, wx, wy, weaponSubPath);
-					} else {
-						Layers.sub.call(self, Layers.DAMAGE, wx, wy, weaponSubPath, mapId);
 					}
 				}, 200);
 			}, 0);
