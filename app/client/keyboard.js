@@ -14,13 +14,13 @@ using("Chat", "Weapon", function (Chat, Weapon) {
 				case 40: direction = 4; break;			// down
 
 				case 66: weapon = "bomb"; break;		// b
-				//case 78: weapon = "napalm"; break;		// n (currently disabled, too slow)
+				//case 78: weapon = "napalm"; break;		// n
 				case 88: weapon = "bolt"; break;		// x
 
-				case 87: weapon = "pickaxe_u"; break;	// w
-				case 83: weapon = "pickaxe_d"; break;	// s
-				case 65: weapon = "pickaxe_l"; break;	// a
-				case 68: weapon = "pickaxe_r"; break;	// d
+				//case 87: weapon = "pickaxe_u"; break;	// w
+				//case 83: weapon = "pickaxe_d"; break;	// s
+				//case 65: weapon = "pickaxe_l"; break;	// a
+				//case 68: weapon = "pickaxe_r"; break;	// d
 
 				case 13:
 					Chat.prompt("Say what?");

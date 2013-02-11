@@ -1,0 +1,27 @@
+.font() {
+	font-family: "DejaVuSansMonoBook", monospace;
+	font-size: 18px;
+	line-height: 1em;
+	color: #aaa;
+}
+
+.inside {
+	background-color: #000;
+	position: relative;
+}
+
+#viewport {
+	box-sizing: border-box;
+	white-space: pre;
+	.font;
+}
+
+.stats {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	background-color: #000;
+	display: inline;
+	padding: 4px 3px 0px 4px;
+	.font;
+}

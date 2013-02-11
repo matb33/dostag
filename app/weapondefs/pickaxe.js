@@ -1,5 +1,9 @@
 using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, Sprite) {
 
+	// Disabling pickaxe, it causes several lag when used frequently (possibly
+	// too many diffs for the server to compute wrt to damage layer?)
+	return;
+
 	function pickaxe(offset, next) {
 		var self = this;
 		var pos = Player.getPosition(self.userId);
@@ -29,9 +33,9 @@ using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, 
 	}
 
 	var options = {
-		initial: 1,
-		resupply: 2500,
-		max: 1,
+		initial: -1,
+		resupply: 0,
+		max: -1,
 		inventorySprite: Sprite.Weapon.PICKAXE
 	};
 
