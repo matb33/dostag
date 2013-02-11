@@ -83,7 +83,7 @@ using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, 
 					// Control removal of damage layer separately. Make it "instant", but wrap it in
 					// a setTimeout so that it has time to take effect
 					_setTimeout(function () {
-						Layers.sub.call(self, Layers.DAMAGE, x + f4.x, y + f4.y, f3.explosion, mapId);
+						Layers.sub.call(self, Layers.DAMAGE, x + f4.x, y + f4.y, f4.explosion, mapId);
 					}, 0);
 				}
 

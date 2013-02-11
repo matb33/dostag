@@ -4,13 +4,12 @@ define("Damage", ["Collections", "Map", "Player"], function (Collections, Map, P
 
 	function kill(userId, killerId) {
 		var killIncrement = userId !== killerId ? 1 : 0;
+		var mapId = Player.getJoinedMapId(userId);
+		var pos = Map.getRandomNonCollidePosition(mapId);
 
 		Meteor.users.update({_id: userId}, {$set: {dead: true}, $inc: {kills: killIncrement}});
 
 		Meteor.setTimeout(function () {
-			var mapId = Player.getJoinedMapId(userId);
-			var pos = Map.getRandomNonCollidePosition(mapId);
-
 			Meteor.users.update({_id: userId}, {$set: {dead: false, position: pos}});
 		}, stayDeadForMs);
 	}
