@@ -20,12 +20,14 @@ define("Renderer", ["Map", "Player", "Sprite", "Layers"], function (Map, Player,
 		output += "   / /_/ // /_/ /___/ / / /  / ___ |/ /_/ /    \n";
 		output += "  /_____/ \\____//____/ /_/  /_/  |_|\\____/     \n";
 		output += "\n\n";
+		output += "            L O A D I N G\n";
+		output += "\n\n";
 
 		if (player) {
 			mapId = Player.getJoinedMapId(player._id);
 			map = Map.getMapById(mapId);
 
-			if (map) {
+			if (map && map.level) {
 				pos = Player.getPosition();
 
 				if (pos) {
@@ -68,7 +70,7 @@ define("Renderer", ["Map", "Player", "Sprite", "Layers"], function (Map, Player,
 												output += others[key].dead ? Sprite.Player.DEAD : Sprite.Player.OTHER;
 											} else {
 												if (map.level[key]) {
-													if (overlay[key] && Map.destructible(map.level[key])) {
+													if (overlay && overlay[key] && Map.destructible(map.level[key])) {
 														output += overlay[key];
 													} else {
 														output += map.level[key];

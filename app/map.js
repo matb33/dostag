@@ -45,7 +45,7 @@ define("Map", ["Collections", "Player", "Weapon", "LayerOps", "Layers", "Sprite"
 
 				// If an overlay exists in the overlay layer,
 				// it should take precedence
-				targetChar = overlay[key] !== null ? overlay[key] : map.level[key];
+				targetChar = overlay && overlay[key] !== null ? overlay[key] : map.level[key];
 				if (!traversable(targetChar)) {
 					return true;
 				}

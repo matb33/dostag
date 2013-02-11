@@ -26,7 +26,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 
 			function traversable(x, y) {
 				var key = y + "_" + x;
-				var targetChar = overlay[key] !== null ? overlay[key] : map.level[key];
+				var targetChar = overlay && overlay[key] !== null ? overlay[key] : map.level[key];
 				return Map.traversable(targetChar);
 			}
 

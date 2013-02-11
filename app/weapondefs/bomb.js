@@ -57,28 +57,42 @@ using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, 
 			var _setTimeout = Meteor.isClient ? window.setTimeout : Meteor.setTimeout;
 
 			_setTimeout(function () {
-				if (Meteor.isClient) { Layers.add.call(self, Layers.WEAPONS, x + f1.x, y + f1.y, f1.explosion); }
-				else { Layers.add.call(self, Layers.DAMAGE, x + f1.x, y + f1.y, f1.explosion, mapId); }
+				if (Meteor.isServer) {
+					// Reduce chatter by setting damage right away, and not incrementally for each frame
+					Layers.add.call(self, Layers.OVERLAY, x + f4.x, y + f4.y, hole, mapId);
+					Layers.add.call(self, Layers.DAMAGE, x + f4.x, y + f4.y, f4.explosion, mapId);
 
-				if (Meteor.isServer) { Layers.add.call(self, Layers.OVERLAY, x + f4.x, y + f4.y, hole, mapId); }
+					// Control removal of damage layer separately. Make it "instant", but wrap it in
+					// a setTimeout so that it has time to take effect
+					_setTimeout(function () {
+						Layers.sub.call(self, Layers.DAMAGE, x + f4.x, y + f4.y, f4.explosion, mapId);
+					}, 0);
+				}
+
+				if (Meteor.isClient) {
+					Layers.add.call(self, Layers.WEAPONS, x + f1.x, y + f1.y, f1.explosion);
+				}
 
 				_setTimeout(function () {
-					if (Meteor.isClient) { Layers.add.call(self, Layers.WEAPONS, x + f2.x, y + f2.y, f2.explosion); }
-					else { Layers.add.call(self, Layers.DAMAGE, x + f2.x, y + f2.y, f2.explosion, mapId); }
+					if (Meteor.isClient) {
+						Layers.add.call(self, Layers.WEAPONS, x + f2.x, y + f2.y, f2.explosion);
+					}
 
 					_setTimeout(function () {
-						if (Meteor.isClient) { Layers.add.call(self, Layers.WEAPONS, x + f3.x, y + f3.y, f3.explosion); }
-						else { Layers.add.call(self, Layers.DAMAGE, x + f3.x, y + f3.y, f3.explosion, mapId); }
+						if (Meteor.isClient) {
+							Layers.add.call(self, Layers.WEAPONS, x + f3.x, y + f3.y, f3.explosion);
+						}
 
 						_setTimeout(function () {
-							if (Meteor.isClient) { Layers.add.call(self, Layers.WEAPONS, x + f4.x, y + f4.y, f4.explosion); }
-							else { Layers.add.call(self, Layers.DAMAGE, x + f4.x, y + f4.y, f4.explosion, mapId); }
+							if (Meteor.isClient) {
+								Layers.add.call(self, Layers.WEAPONS, x + f4.x, y + f4.y, f4.explosion);
+							}
 
 							_setTimeout(function () {
-								if (Meteor.isClient) { Layers.sub.call(self, Layers.WEAPONS, x + f4.x, y + f4.y, f4.explosion); }
-								else { Layers.sub.call(self, Layers.DAMAGE, x + f4.x, y + f4.y, f4.explosion, mapId); }
-
-								if (Meteor.isClient) { Layers.add.call(self, Layers.OVERLAY, x + f4.x, y + f4.y, hole); }
+								if (Meteor.isClient) {
+									Layers.sub.call(self, Layers.WEAPONS, x + f4.x, y + f4.y, f4.explosion);
+									Layers.add.call(self, Layers.OVERLAY, x + f4.x, y + f4.y, hole);
+								}
 
 								next();
 							}, 500);

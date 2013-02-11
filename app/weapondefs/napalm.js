@@ -51,7 +51,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 							}
 
 							key = y[d] + "_" + x[d];
-							targetChar = overlay[key] !== null ? overlay[key] : map.level[key];
+							targetChar = overlay && overlay[key] !== null ? overlay[key] : map.level[key];
 
 							if (Map.traversable(targetChar)) {
 								if (step[d] === 1) {
