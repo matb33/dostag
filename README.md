@@ -1,7 +1,7 @@
 # DOSTAG
 ### Proof of concept multiplayer game written using the [Meteor](http://www.meteor.com/) framework
 
-DOSTAG is a simple multiplayer game in which you try to blow up other players with bombs. The level is a simple ASCII box-art text file.
+DOSTAG is a simple multiplayer game in which you try to blow up other players with bombs.
 
 ## Why did I write this thing?
 
@@ -26,7 +26,7 @@ Not actively. It's only meant as a proof of concept — and besides... it's real
 
 On that topic, there is huge room for improvement. Feel free to fork this project, change it, learn from it, build on it, whatever. Here are some thoughts:
 
--	First and foremost, my TODO still has an outstanding item I plan on implementing, so this line of text might disappear from this README soon... But I'd like the intro screen to show you other maps you can join along with player count. Then a little JOIN button. Since maps are text files loaded via an HTTP GET request, it's trivial to implement this. Oh and of course, loading a new map by typing in a URL. I just haven't gotten around to it.
+-	First and foremost, my TODO still has an outstanding item I plan on implementing, so this line of text might disappear from this README soon... But I'd like the intro screen to show you other maps you can join along with player count, with a little JOIN button. Since maps are text files (ASCII box-art actually) loaded via an HTTP GET request, it's trivial to implement this. Oh and of course, loading a new map by typing in a URL. I just haven't gotten around to it.
 
 -	Speed/network optimizations are needed. I have gone through several techniques already, but my game coding experience is rather limited. I'm probably re-inventing the wheel (badly) on several fronts... Perhaps game developers who are dabbling in Meteor could use this code as a starting point and put their expertise into making it a more fluid experience. I'm sure some of it has to do with Meteor itself, considering it's not intended for this type of use case!
 
