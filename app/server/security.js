@@ -1,16 +1,12 @@
 using("Collections", function (Collections) {
 
-	// Active map data can not be modified directly by the client
+	// Map data can not be modified directly by the client
 	Collections.Maps.allow({
 		insert: function () {
 			return false;
 		},
-		update: function (userId, docs, fields) {
-			// TEMPORARY! just allow client to modify so we don't get
-			// access denied despite it working on the server
- 			//return true;
-
- 			return false;	// let access denied happen.
+		update: function () {
+			return false;
 		},
 		remove: function () {
 			return false;
@@ -21,7 +17,9 @@ using("Collections", function (Collections) {
 	// They are also not allowed to modify their inventory
 	Meteor.users.deny({
 		update: function (userId, docs, fields) {
-			return _.contains(fields, "position");// || _.contains(fields, "inventory");
+			// TODO: have to find a way to do this properly... need the client to
+			// change their position quickly and have it reflect on the server...
+			//return _.contains(fields, "position") || _.contains(fields, "inventory");
 		}
 	});
 
@@ -33,7 +31,7 @@ using("Collections", function (Collections) {
 		update: function () {
  			return false;
 		},
-		remove: function (userId, docs) {
+		remove: function () {
 			return false;
 		}
 	});

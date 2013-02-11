@@ -67,10 +67,12 @@ define("Renderer", ["Map", "Player", "Sprite", "Layers"], function (Map, Player,
 											if (others[key]) {
 												output += others[key].dead ? Sprite.Player.DEAD : Sprite.Player.OTHER;
 											} else {
-												if (overlay[key] && Map.destructible(map.level[key])) {
-													output += overlay[key];
-												} else {
-													output += map.level[key];
+												if (map.level[key]) {
+													if (overlay[key] && Map.destructible(map.level[key])) {
+														output += overlay[key];
+													} else {
+														output += map.level[key];
+													}
 												}
 											}
 										}
