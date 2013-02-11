@@ -4,6 +4,14 @@ define("Stats", ["Weapon"], function (Weapon) {
 		return Meteor.users.find({idle: false}).count();
 	}
 
+	function getKills() {
+		var player = Meteor.user();
+
+		if (player) {
+			return player.kills || 0;
+		}
+	}
+
 	function getInventory() {
 		var inventory = [];
 		var player = Meteor.user();
@@ -26,7 +34,8 @@ define("Stats", ["Weapon"], function (Weapon) {
 
 	return {
 		getPlayerCount: getPlayerCount,
-		getInventory: getInventory
+		getInventory: getInventory,
+		getKills: getKills
 	};
 
 });

@@ -76,8 +76,8 @@ define("Layers", ["Collections", "LayerOps"], function (Collections, LayerOps) {
 		};
 	}
 
-	function add(layerName, x, y, text, optMapId) {
-		var set = _.isString(text) ? LayerOps.add(x, y, text) : text;
+	function add(layerName, x, y, text, optMapId, optUserId) {
+		var set = _.isString(text) ? LayerOps.add(x, y, text, {}, optUserId) : text;
 		var layer = getLayerData.call(this, layerName, optMapId);
 		layer.collection.update({_id: layer.doc._id}, {$set: set});
 	}

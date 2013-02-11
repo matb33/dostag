@@ -48,15 +48,16 @@ define("LayerOps", ["Sprite"], function (Sprite) {
 		return grid;
 	}
 
-	function add(sx, sy, text, target) {
-		var x, y, c, result = mapStringToGridObject(text, "grid");
-		target = target || {};
+	function add(sx, sy, text, optTarget, optUserId) {
+		var x, y, c, data, result = mapStringToGridObject(text, "grid");
+		var target = optTarget || {};
 
 		for (y = sy; y < sy + result.height; y++) {
 			for (x = sx; x < sx + result.width; x++) {
 				c = result.grid[(y - sy) + "_" + (x - sx)];
 				if (c !== Sprite.Map.TRANSPARENT) {
-					target[y + "_" + x] = c;
+					data = optUserId ? {u: optUserId, c: c} : c;
+					target[y + "_" + x] = data;
 				}
 			}
 		}

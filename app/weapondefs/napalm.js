@@ -56,7 +56,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 							if (Map.traversable(targetChar)) {
 								if (step[d] === 1) {
 									if (Meteor.isClient) { Layers.add.call(self, Layers.WEAPONS, x[d], y[d], Sprite.Weapon.FIRE); }
-									else { Layers.add.call(self, Layers.DAMAGE, x[d], y[d], Sprite.Weapon.FIRE, mapId); }
+									else { Layers.add.call(self, Layers.DAMAGE, x[d], y[d], Sprite.Weapon.FIRE, mapId, self.userId); }
 								} else {
 									if (Meteor.isClient) { Layers.sub.call(self, Layers.WEAPONS, x[d], y[d], Sprite.Weapon.FIRE); }
 									else { Layers.sub.call(self, Layers.DAMAGE, x[d], y[d], Sprite.Weapon.FIRE, mapId); }

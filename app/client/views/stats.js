@@ -4,8 +4,12 @@ using("Stats", "Sprite", function (Stats, Sprite) {
 		return Stats.getPlayerCount();
 	};
 
-	Template.stats.playerSprite = function () {
-		return Sprite.Player.OTHER;
+	Template.stats.playerKills = function () {
+		return Stats.getKills();
+	};
+
+	Template.stats.killsSprite = function () {
+		return Sprite.Player.DEAD;
 	};
 
 	Template.stats.inventory = function () {

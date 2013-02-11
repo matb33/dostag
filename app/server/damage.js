@@ -1,12 +1,17 @@
-define("Damage", ["Collections"], function (Collections) {
+define("Damage", ["Collections", "Map", "Player"], function (Collections, Map, Player) {
 
 	var stayDeadForMs = 15000;
 
-	function kill(userId) {
-		Meteor.users.update({_id: userId}, {$set: {dead: true}});
+	function kill(userId, killerId) {
+		var killIncrement = userId !== killerId ? 1 : 0;
+
+		Meteor.users.update({_id: userId}, {$set: {dead: true}, $inc: {kills: killIncrement}});
+
 		Meteor.setTimeout(function () {
-			Meteor.users.update({_id: userId}, {$set: {dead: false}});
-			Meteor.call("moveToRandomNonCollide", userId);
+			var mapId = Player.getJoinedMapId(userId);
+			var pos = Map.getRandomNonCollidePosition(mapId);
+
+			Meteor.users.update({_id: userId}, {$set: {dead: false, position: pos}});
 		}, stayDeadForMs);
 	}
 
@@ -16,9 +21,11 @@ define("Damage", ["Collections"], function (Collections) {
 		changed: function (doc) {
 			var players = Meteor.users.find({mapId: doc.mapId});
 			players.forEach(function (player) {
+				var data;
 				if (player.position) {
-					if (doc[player.position.y + "_" + player.position.x] !== null) {
-						kill(player._id);
+					data = doc[player.position.y + "_" + player.position.x];
+					if (data && data.c !== null) {
+						kill(player._id, data.u);
 					}
 				}
 			});
@@ -29,10 +36,11 @@ define("Damage", ["Collections"], function (Collections) {
 	var players = Meteor.users.find();
 	players.observe({
 		changed: function (player) {
-			var damageLayer = Collections.LayerDamage.findOne({mapId: player.mapId});
+			var data, damageLayer = Collections.LayerDamage.findOne({mapId: player.mapId});
 			if (player.position) {
-				if (damageLayer[player.position.y + "_" + player.position.x] !== null) {
-					kill(player._id);
+				data = damageLayer[player.position.y + "_" + player.position.x];
+				if (data && data.c !== null) {
+					kill(player._id, data.u);
 				}
 			}
 		}

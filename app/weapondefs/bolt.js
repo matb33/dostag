@@ -8,7 +8,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 		id: "bolt",
 		initial: 0,
 		max: 1,
-		resupply: 30000,
+		resupply: 120000,
 		inventorySprite: Sprite.Weapon.BOLT,
 		sequence: function (next) {
 			var self = this;
@@ -92,7 +92,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 					Layers.add.call(self, Layers.WEAPONS, wx, wy, weaponPath);
 				} else {
 					// Add to damage layer, but remove right away on next tick
-					Layers.add.call(self, Layers.DAMAGE, wx, wy, weaponPath, mapId);
+					Layers.add.call(self, Layers.DAMAGE, wx, wy, weaponPath, mapId, self.userId);
 					_setTimeout(function () {
 						Layers.sub.call(self, Layers.DAMAGE, wx, wy, weaponSubPath, mapId);
 					}, 0);

@@ -16,7 +16,7 @@ using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, 
 		if (Meteor.isClient) {
 			Layers.add.call(self, Layers.WEAPONS, x, y, Sprite.Weapon.PICKAXE);
 		} else {
-			Layers.add.call(self, Layers.DAMAGE, x, y, Sprite.Weapon.PICKAXE, mapId);
+			Layers.add.call(self, Layers.DAMAGE, x, y, Sprite.Weapon.PICKAXE, mapId, self.userId);
 		}
 
 		Layers.add.call(self, Layers.OVERLAY, x, y, " ", mapId);

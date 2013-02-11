@@ -1,6 +1,8 @@
 # DOSTAG
 ### Proof of concept multiplayer game written using the [Meteor](http://www.meteor.com/) framework
 
+DOSTAG is a simple multiplayer game in which you try to blow up other players with bombs. The level is a simple ASCII box-art text file.
+
 ## Why did I write this thing?
 
 Lots of reasons:
