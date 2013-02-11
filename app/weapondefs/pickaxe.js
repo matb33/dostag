@@ -1,6 +1,6 @@
 using("Weapon", "Layers", "Player", "Sprite", function (Weapon, Layers, Player, Sprite) {
 
-	// Disabling pickaxe, it causes several lag when used frequently (possibly
+	// Disabling pickaxe, it causes severe lag when used frequently (possibly
 	// too many diffs for the server to compute wrt to damage layer?)
 	return;
 

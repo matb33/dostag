@@ -124,7 +124,7 @@ define("Map", ["Collections", "Player", "Weapon", "LayerOps", "Layers", "Sprite"
 					mapId = Collections.Maps.insert(data);
 				}
 
-				// Reset and server layers, such as overlay and damage
+				// Reset any server layers, such as overlay and damage
 				Layers.resetServerLayers(_.extend(data, {_id: mapId}));
 
 				Collections.Activities.remove({mapId: mapId});
