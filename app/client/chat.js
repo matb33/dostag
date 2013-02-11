@@ -47,21 +47,15 @@ define("Chat", ["Layers", "Player", "Activity"], function (Layers, Player, Activ
 	}
 
 	function processActivity(next) {
-		var result, pos, mapId, x, y;
+		var result = generateChatBubble(this.data, 25);
+		var pos = Player.getPosition(this.userId);
+		var x = pos.x - 2;
+		var y = pos.y - result.height;
 
-		if (Meteor.isClient) {
-			result = generateChatBubble(this.data, 25);
-			pos = Player.getPosition(this.userId);
-			x = pos.x - 2;
-			y = pos.y - result.height;
-
-			Layers.add(Layers.CHATTER, x, y, result.bubble);
-		}
+		Layers.add(Layers.CHATTER, x, y, result.bubble);
 
 		setTimeout(function () {
-			if (Meteor.isClient) {
-				Layers.sub(Layers.CHATTER, x, y, result.bubble);
-			}
+			Layers.sub(Layers.CHATTER, x, y, result.bubble);
 			next();
 		}, chatBubbleStayMsPerChar * this.data.length);
 	}
