@@ -38,10 +38,28 @@ define("Stats", ["Weapon"], function (Weapon) {
 		return inventory;
 	}
 
+	function getTopKills(limit) {
+		var options = {sort: {kills: -1}};
+		if (limit > 0) {
+			options = _.extend(options, {limit: limit});
+		}
+		return Meteor.users.find({idle: false}, options);
+	}
+
+	function getTopDeaths(limit) {
+		var options = {sort: {deaths: -1}};
+		if (limit > 0) {
+			options = _.extend(options, {limit: limit});
+		}
+		return Meteor.users.find({idle: false}, options);
+	}
+
 	return {
 		getPlayerCount: getPlayerCount,
 		getInventory: getInventory,
-		getKills: getKills
+		getKills: getKills,
+		getTopKills: getTopKills,
+		getTopDeaths: getTopDeaths
 	};
 
 });

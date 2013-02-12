@@ -21,7 +21,7 @@ define("Damage", ["Collections", "Map", "Player"], function (Collections, Map, P
 	var damageLayer = Collections.LayerDamage.find();
 	damageLayer.observe({
 		changed: function (doc) {
-			var players = Meteor.users.find({mapId: doc.mapId});
+			var players = Meteor.users.find({mapId: doc.mapId, idle: false, dead: false});
 			players.forEach(function (player) {
 				var data;
 				if (player.position) {
@@ -35,7 +35,7 @@ define("Damage", ["Collections", "Map", "Player"], function (Collections, Map, P
 	});
 
 	// Detect damage to players caused by player entering a damage layer
-	var players = Meteor.users.find();
+	var players = Meteor.users.find({idle: false, dead: false});
 	players.observe({
 		changed: function (player) {
 			var data, damageLayer = Collections.LayerDamage.findOne({mapId: player.mapId});

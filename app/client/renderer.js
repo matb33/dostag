@@ -32,7 +32,7 @@ define("Renderer", ["Map", "Player", "Sprite", "Layers"], function (Map, Player,
 
 				if (pos) {
 					// Get positions of other players
-					players = Meteor.users.find();
+					players = Meteor.users.find({idle: false});
 					players.forEach(function (player) {
 						var ox = player.position && player.position.x || -1;
 						var oy = player.position && player.position.y || -1;

@@ -20,7 +20,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 
 			var x = [], y = [], count = [], hold = [];
 			var wx, wy, ox, oy, d, safe = 0;
-			var weaponPath = {}, weaponSubPath = {}, overlayPath = {};
+			var weaponPath = {}, weaponSubPath = {}, damagePath = {}, overlayPath = {};
 
 			var destroyInitial = 1;
 
@@ -34,6 +34,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 				var key = y + "_" + x;
 				weaponPath[key] = Sprite.Weapon.BOLT;
 				weaponSubPath[key] = null;
+				damagePath[key] = {c: Sprite.Weapon.BOLT, u: self.userId};
 				wx = (wx === undefined || x < wx) ? x : wx;
 				wy = (wy === undefined || y < wy) ? y : wy;
 			}
@@ -92,7 +93,7 @@ using("Weapon", "Map", "Player", "Sprite", "Layers", function (Weapon, Map, Play
 					Layers.add.call(self, Layers.WEAPONS, wx, wy, weaponPath);
 				} else {
 					// Add to damage layer, but remove right away on next tick
-					Layers.add.call(self, Layers.DAMAGE, wx, wy, weaponPath, mapId, self.userId);
+					Layers.add.call(self, Layers.DAMAGE, wx, wy, damagePath, mapId);	// userId not passed, we are passing an already prepared object
 					_setTimeout(function () {
 						Layers.sub.call(self, Layers.DAMAGE, wx, wy, weaponSubPath, mapId);
 					}, 0);

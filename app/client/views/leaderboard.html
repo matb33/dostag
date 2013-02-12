@@ -1,0 +1,24 @@
+<template name="leaderboard">
+	<div class="leaderboard">
+		<div class="kills">
+			{{#if topKills}}
+				<h4>Kills</h4>
+				<ol>
+					{{#each topKills}}
+						<li>{{username}}: {{kills}}</li>
+					{{/each}}
+				</ol>
+			{{/if}}
+		</div>
+		<div class="deaths">
+			{{#if topDeaths}}
+				<h4>Deaths</h4>
+				<ol>
+					{{#each topDeaths}}
+						<li>{{username}}: {{deaths}}</li>
+					{{/each}}
+				</ol>
+			{{/if}}
+		</div>
+	</div>
+</template>

@@ -65,7 +65,7 @@ define("Weapon", ["Activity"], function (Activity) {
 		_.each(defs, function (def, id) {
 			if (def.resupply > 0) {
 				Meteor.setInterval(function () {
-					var players = Meteor.users.find({idle: false});
+					var players = Meteor.users.find({idle: false, dead: false});
 					players.forEach(function (player) {
 						var inc = {};
 						if (player.inventory[id] < def.max) {
