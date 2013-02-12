@@ -14,6 +14,7 @@ define("Map", ["Collections", "Player", "Weapon", "LayerOps", "Layers", "Sprite"
 
 	function destructible(c) {
 		var indestructible = [
+			Sprite.Map.OOB,
 			Sprite.Map.METAL_FULL,
 			Sprite.Map.METAL_BOTTOM,
 			Sprite.Map.METAL_TOP,

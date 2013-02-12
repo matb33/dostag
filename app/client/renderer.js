@@ -54,26 +54,30 @@ define("Renderer", ["Map", "Player", "Sprite", "Layers"], function (Map, Player,
 					for (y = y1; y < y2; y++) {
 						for (x = x1; x < x2; x++) {
 							key = y + "_" + x;
-							if (chatter[key]) {
+							if (chatter && chatter[key]) {
 								output += chatter[key];
 							} else {
 								if (x < 0 || x >= map.width || y < 0 || y >= map.height) {
 									output += Sprite.Map.OOB;
 								} else {
-									if (weapons[key]) {
-										output += weapons[key];
-									} else {
-										if (x == pos.x && y == pos.y) {
-											output += player.dead ? Sprite.Player.DEAD : Sprite.Player.YOU;
+									if (map.level[key]) {
+										if (map.level[key] === Sprite.Map.OOB) {
+											output += Sprite.Map.OOB;
 										} else {
-											if (others[key]) {
-												output += others[key].dead ? Sprite.Player.DEAD : Sprite.Player.OTHER;
+											if (weapons && weapons[key]) {
+												output += weapons[key];
 											} else {
-												if (map.level[key]) {
-													if (overlay && overlay[key] && Map.destructible(map.level[key])) {
-														output += overlay[key];
+												if (x == pos.x && y == pos.y) {
+													output += player.dead ? Sprite.Player.DEAD : Sprite.Player.YOU;
+												} else {
+													if (others[key]) {
+														output += others[key].dead ? Sprite.Player.DEAD : Sprite.Player.OTHER;
 													} else {
-														output += map.level[key];
+														if (overlay && overlay[key] && Map.destructible(map.level[key])) {
+															output += overlay[key];
+														} else {
+															output += map.level[key];
+														}
 													}
 												}
 											}
