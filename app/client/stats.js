@@ -6,9 +6,15 @@ define("Stats", ["Weapon"], function (Weapon) {
 
 	function getKills() {
 		var player = Meteor.user();
-
 		if (player) {
 			return player.kills || 0;
+		}
+	}
+
+	function getDeaths() {
+		var player = Meteor.user();
+		if (player) {
+			return player.deaths || 0;
 		}
 	}
 

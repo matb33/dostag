@@ -81,6 +81,7 @@ define("Map", ["Collections", "Player", "Weapon", "LayerOps", "Layers", "Sprite"
 					idle: false,
 					dead: false,
 					kills: 0,
+					deaths: 0,
 					last_keepalive: Date.now(),
 					inventory: Weapon.getInitialInventory()
 				}});
