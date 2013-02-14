@@ -35,7 +35,7 @@ using("Collections", "Map", function (Collections, Map) {
 		if (Meteor.isClient) {
 			Meteor.subscribe("maps");
 
-			Meteor.autosubscribe(function () {
+			Meteor.autorun(function () {
 				var player = Meteor.user();
 				if (player) {
 					Meteor.subscribe("mapUsers", player.mapId);
